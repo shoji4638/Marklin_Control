@@ -5,46 +5,62 @@
         <title>データベース登録</title>
     </head>
     <body>
-        {% if trains == [] %}
-            <p> なにもなし </p>
-        {% else %}
-        <table border="1">
-            <tr>
-                <th>種別</th>
-                <th>名前</th>
-                <th>長さ</th>            
-                <th>画像</th>            
-            </tr>
-            {% for train in trains %}
-                <tr>
-                    <td>{{ train.type }}</td>
-                    <td>{{ train.name }}</td>
-                    <td>{{ train.length }}</td>
-                    <td>{{ train.picture }}</td>
-                </tr>
-            {% endfor %}
-        </table>
-        {% endif %}
-
         <h2>入力フォーム</h2>
         <form method="post" action="{{ url_for('register') }}">
         <table border="1">
             <tr>
+                <th>ID</th>
                 <th>種別</th>
                 <th>名前</th>
                 <th>長さ</th>
                 <th>写真</th>
             </tr>
             <tr>
-                <td><input type="text" name="type"></td>
+                <td><input type="text" name="id"></td>
+                <td>
+                    <input type="radio" id="r1" name="type" value="機関車"><label for="r1">:機関車</label>
+                    <input type="radio" id="r2" name="type" value="貨車"><label for="r2">:貨車</label>
+                    <input type="radio" id="r3" name="type" value="客車"><label for="r3">:客車</label>
+                </td>
                 <td><input type="text" name="name"></td>
                 <td><input type="text" name="length"></td>
                 <td><input type="text" name="picture"></td>
             </tr>
         </table>
-        <br>
         <input type="submit" value="登録">
         </form>
-    </body>
 
+        <br>
+        {% if trains == [] %}
+            <p> 登録 機関車なし </p>
+        {% else %}
+
+        <h2>登録 車輛</h2>
+        <form action = {{url_for('posttest')}} method = "POST">
+        <table border="1">
+            <tr>
+                <th>TagID</th>
+                <th>種別</th>
+                <th>名前</th>
+                <th>長さ</th>            
+                <th>画像</th>            
+                <th>操作</th>            
+            </tr>
+            {% for train in trains %}
+                <tr>
+                    <td>{{ train.id }}</td>
+                    <td>{{ train.type }}</td>
+                    <td>{{ train.name }}</td>
+                    <td>{{ train.length }}</td>
+                    <td>{{ train.picture }}</td>
+                    <td>
+                        <button type = "Submit" name = "action" value = "Del:{{ train.id }}"> 削除</button>
+                        <button type = "Submit" name = "change" value = "Chg:{{ train.id }}"> 変更</button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        </form>
+        {% endif %}
+    </body>
 </html>
