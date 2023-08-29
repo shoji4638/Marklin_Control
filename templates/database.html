@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <title>データベース登録</title>
+    </head>
+    <body>
+        {% if trains == [] %}
+            <p> なにもなし </p>
+        {% else %}
+        <table border="1">
+            <tr>
+                <th>種別</th>
+                <th>名前</th>
+                <th>長さ</th>            
+                <th>画像</th>            
+            </tr>
+            {% for train in trains %}
+                <tr>
+                    <td>{{ train.type }}</td>
+                    <td>{{ train.name }}</td>
+                    <td>{{ train.length }}</td>
+                    <td>{{ train.picture }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+
+        <h2>入力フォーム</h2>
+        <form method="post" action="{{ url_for('register') }}">
+        <table border="1">
+            <tr>
+                <th>種別</th>
+                <th>名前</th>
+                <th>長さ</th>
+                <th>写真</th>
+            </tr>
+            <tr>
+                <td><input type="text" name="type"></td>
+                <td><input type="text" name="name"></td>
+                <td><input type="text" name="length"></td>
+                <td><input type="text" name="picture"></td>
+            </tr>
+        </table>
+        <br>
+        <input type="submit" value="登録">
+        </form>
+    </body>
+
+</html>

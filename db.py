@@ -1,8 +1,8 @@
 import sqlite3
 
-DATABASE = 'database.db'
+DATABASE = 'marklin.db'
 
 def create_books_table():
     con = sqlite3.connect(DATABASE)
-    con.execute('CREATE TABLE IF NOT EXISTS books (title, price, arrival_day)')
+    con.execute('CREATE TABLE IF NOT EXISTS trains (type, name, length, picture)')
     con.close()
