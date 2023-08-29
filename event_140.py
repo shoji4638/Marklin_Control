@@ -48,7 +48,7 @@ import PySimpleGUI as sg
 import time
 import requests
 import random
-import pickle#JSONでデータ(辞書型など)保存用
+import pickle #JSONでデータ(辞書型など)保存用
 import re
 import os
 import glob
