@@ -18,49 +18,99 @@ def index():
         'index.html'
     )
 
-
-@app.route('/posttest',methods = ['POST'])
-def posttest():
-
-    try:
-        print(request.form['action'],request.form['action'][4:])
-        con = sqlite3.connect(DATABASE)
-        db_trains = con.execute("delete from trains where id = '{}'".format(request.form['action'][4:]))
-        print(db_trains)
-        con.commit()
-        con.close()
-        return redirect(url_for('database'))
-
-    except:
-        print(request.form['change'])
-        
-        return redirect(url_for('database', methods = 'ABC'))
-
-#    print(request.form['change'])
-#    return redirect(url_for('index'))
-
-@app.route('/database')
+@app.route('/database', methods=['GET', 'POST'])
 def database():
 
 #    print(request.form['mothods'])
 
+    if request.method == 'GET':
+
+        trains = select_trains('id')
+#        con = sqlite3.connect(DATABASE)
+#        db_trains = con.execute('SELECT * FROM trains').fetchall()
+#        con.close()
+
+ #       trains = []
+ #       for i,row in enumerate(db_trains):
+ #           trains.append({
+ #               'id': row[0],
+ #               'type': row[1],
+ #               'name': row[2],
+ #               'length': row[3],
+ #               'picture': row[4],
+ #               'num': i})
+            
+        input_train = {
+            'id': '',
+            'type': '',
+            'name': '',
+            'length': '',
+            'picture': ''
+        }
+
+        return render_template(
+            'database.html',
+            trains=trains,input_train=input_train
+        )
+    
+    else:
+        return 'A>ABC</A'
+
+@app.route('/<string:ClearId>/clear', methods=['POST'])
+def clear_id(ClearId):
+
+    print("ClearID:",ClearId)
     con = sqlite3.connect(DATABASE)
-    db_trains = con.execute('SELECT * FROM trains').fetchall()
+    db_trains = con.execute("delete from trains where id = '{}'".format(ClearId))
+#    print(db_trains)
+    con.commit()
+    con.close()
+    return redirect(url_for('database'))
+
+@app.route('/<string:ChangeId>/change', methods=['POST'])
+def change_data(ChangeId):
+
+    print("ChangeID:",ChangeId)
+
+    trains = select_trains('id')
+
+#    db_trains = con.execute('SELECT * FROM trains ORDER BY id').fetchall()
+#    trains = []
+#    for i,row in enumerate(db_trains):
+#        trains.append({
+#            'id': row[0],
+#            'type': row[1],
+#            'name': row[2],
+#            'length': row[3],
+#            'picture': row[4],
+#           'num': i})
+
+
+    con = sqlite3.connect(DATABASE)
+    db_trains = con.execute("SELECT * FROM trains WHERE id = '{}'".format(ChangeId)).fetchall()        
+    input_train = {
+        'id': db_trains[0][0],
+        'type': db_trains[0][1],
+        'name': db_trains[0][2],
+        'length': db_trains[0][3],
+        'picture': db_trains[0][4]
+    }
+
     con.close()
 
-    trains = []
-    for i,row in enumerate(db_trains):
-        trains.append({
-            'id': row[0],
-            'type': row[1],
-            'name': row[2],
-            'length': row[3],
-            'picture': row[4],
-            'num': i})
+    return render_template(
+        '/database.html',
+        trains=trains,input_train=input_train
+    )
+
+
+@app.route('/<string:sort_order>/sort', methods=['POST'])
+def sort_order(sort_order):
+    print(sort_order)
 
     return render_template(
-        'database.html',
-        trains=trains
+        '/database.html',
+        trains=trains,input_train=input_train
     )
 
 @app.route('/registar', methods=['POST'])
@@ -77,11 +127,65 @@ def register():
         print('Length Match!!!!')
 
         con = sqlite3.connect(DATABASE)
-        con.execute('INSERT INTO trains VALUES(?, ?, ?, ?, ?)',
-                [id, type, name, length, picture])
+#        con.execute('INSERT INTO trains VALUES(?, ?, ?, ?, ?)',
+#                [id, type, name, length, picture])
+#        con.execute("delete from trains where id = '{}'".format(id))
+#        con.execute('REPLACE INTO trains VALUES(?, ?, ?, ?, ?)',
+#                [id, type, name, length, picture])
+        con.execute('REPLACE INTO trains (id,type,name,length,picture) VALUES(?, ?, ?, ?, ?)',
+                    [id, type, name, length, picture])
         con.commit()
         con.close()
+        msg_error = '正常に更新しました'
     else:
-        print('入力エラー')
+        msg_error = 'TagIDフォーマットに異常があります！？'
+        print(msg_error)
 
-    return redirect(url_for('database'))
+    trains = select_trains('id')
+
+#    con = sqlite3.connect(DATABASE)
+#    db_trains = con.execute('SELECT * FROM trains ORDER BY id').fetchall()
+#    con.close()
+#
+#    trains = []
+#    for i,row in enumerate(db_trains):
+#        trains.append({
+#            'id': row[0],
+#            'type': row[1],
+#            'name': row[2],
+#            'length': row[3],
+#            'picture': row[4],
+#            'num': i})
+        
+    input_train = {
+        'id': '',
+        'type': '',
+        'name': '',
+        'length': '',
+        'picture': ''
+    }
+
+#    return redirect(url_for('database'))
+    return render_template(
+        '/database.html',
+        trains=trains,input_train=input_train,msg_error=msg_error
+    )
+
+def select_trains(sort_order):
+    
+    print(sort_order)
+    con = sqlite3.connect(DATABASE)
+    db_trains = con.execute('SELECT * FROM trains ORDER BY {}'.format(sort_order)).fetchall()
+    con.close()
+
+    trains = []
+    for i,row in enumerate(db_trains):
+        trains.append({
+            'id': row[0],
+            'type': row[1],
+            'name': row[2],
+            'length': row[3],
+            'picture': row[4],
+            'num': i})
+
+    return trains

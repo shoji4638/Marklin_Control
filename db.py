@@ -4,5 +4,5 @@ DATABASE = 'marklin.db'
 
 def create_books_table():
     con = sqlite3.connect(DATABASE)
-    con.execute('CREATE TABLE IF NOT EXISTS trains (id, type, name, length, picture)')
+    con.execute('CREATE TABLE IF NOT EXISTS trains (id PRIMARY KEY, type, name, length, picture)')
     con.close()
