@@ -43,7 +43,6 @@
         <input type="submit" value="登録">
         </form>
         <h3>メッセージ ->{{ msg_error }}</h3>
-        <br>
         {% if trains == [] %}
             <p> 登録 機関車なし </p>
         {% else %}
@@ -53,14 +52,22 @@
         <table border="1">
             <tr>
                 <form method="POST" action="sort">
-                <th>
-                    TagID
+                <th>TagID
                     <button type = "Submit" name = "sort" value = "id_up" formaction="/id_up/sort">↑</button>
                     <button type = "Submit" name = "sort" value = "id_down" formaction="/id_down/sort">↓</button>
                 </th>
-                <th>種別</th>
-                <th>名前</th>
-                <th>長さ</th>            
+                <th>種別
+                    <button type = "Submit" name = "sort" value = "type_up" formaction="/type_up/sort">↑</button>
+                    <button type = "Submit" name = "sort" value = "type_down" formaction="/type_down/sort">↓</button>
+                </th>
+                <th>名前
+                    <button type = "Submit" name = "sort" value = "name_up" formaction="/name_up/sort">↑</button>
+                    <button type = "Submit" name = "sort" value = "name_down" formaction="/name_down/sort">↓</button>
+                </th>
+                <th>長さ
+                    <button type = "Submit" name = "sort" value = "length_up" formaction="/length_up/sort">↑</button>
+                    <button type = "Submit" name = "sort" value = "length_down" formaction="/length_down/sort">↓</button>
+                </th>            
                 <th>画像</th>            
                 <th>操作</th>
                 </form>

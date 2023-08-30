@@ -26,19 +26,6 @@ def database():
     if request.method == 'GET':
 
         trains = select_trains('id')
-#        con = sqlite3.connect(DATABASE)
-#        db_trains = con.execute('SELECT * FROM trains').fetchall()
-#        con.close()
-
- #       trains = []
- #       for i,row in enumerate(db_trains):
- #           trains.append({
- #               'id': row[0],
- #               'type': row[1],
- #               'name': row[2],
- #               'length': row[3],
- #               'picture': row[4],
- #               'num': i})
             
         input_train = {
             'id': '',
@@ -74,18 +61,6 @@ def change_data(ChangeId):
 
     trains = select_trains('id')
 
-#    db_trains = con.execute('SELECT * FROM trains ORDER BY id').fetchall()
-#    trains = []
-#    for i,row in enumerate(db_trains):
-#        trains.append({
-#            'id': row[0],
-#            'type': row[1],
-#            'name': row[2],
-#            'length': row[3],
-#            'picture': row[4],
-#           'num': i})
-
-
     con = sqlite3.connect(DATABASE)
     db_trains = con.execute("SELECT * FROM trains WHERE id = '{}'".format(ChangeId)).fetchall()        
     input_train = {
@@ -107,6 +82,33 @@ def change_data(ChangeId):
 @app.route('/<string:sort_order>/sort', methods=['POST'])
 def sort_order(sort_order):
     print(sort_order)
+
+    if sort_order == 'id_up':
+        trains = select_trains('id')
+    elif sort_order == 'id_down':
+        trains = select_trains('id DESC')
+    elif sort_order == 'type_up':
+        trains = select_trains('type')
+#    elif sort_order == 'type_down':
+#        trains = select_trains('type DESC')
+    elif sort_order == 'name_up':
+        trains = select_trains('name')
+    elif sort_order == 'name_down':
+        trains = select_trains('name DESC')
+    elif sort_order == 'length_up':
+        trains = select_trains('length')
+    elif sort_order == 'length_down':
+        trains = select_trains('length DESC')
+    else:
+        trains = select_trains('id')
+
+    input_train = {
+        'id': '',
+        'type': '',
+        'name': '',
+        'length': '',
+        'picture': ''
+    }
 
     return render_template(
         '/database.html',
@@ -143,20 +145,6 @@ def register():
 
     trains = select_trains('id')
 
-#    con = sqlite3.connect(DATABASE)
-#    db_trains = con.execute('SELECT * FROM trains ORDER BY id').fetchall()
-#    con.close()
-#
-#    trains = []
-#    for i,row in enumerate(db_trains):
-#        trains.append({
-#            'id': row[0],
-#            'type': row[1],
-#            'name': row[2],
-#            'length': row[3],
-#            'picture': row[4],
-#            'num': i})
-        
     input_train = {
         'id': '',
         'type': '',
