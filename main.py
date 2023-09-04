@@ -2,6 +2,7 @@ from Marklin_Control import app
 from flask import render_template, request, redirect,url_for
 import sqlite3
 import re
+
 DATABASE = 'marklin.db'
 
 #@app.route('/')
@@ -18,11 +19,74 @@ def index():
         'index.html'
     )
 
+@app.route('/itemview', methods=['GET', 'POST'])
+def itemview():
+#    print(request.form['mothods'])
+    if request.method == 'GET':
+
+        #Items_T = [{'id':'123', 'prooduct_no':'ABC', 'name':'DEF', 'picture':'GHI'}]
+        Items_T = select_Items_T('id')
+        list_len = len(Items_T)
+
+        return render_template(
+            'itemview.html',
+            list_len=list_len,Items_T=Items_T
+        )
+    
+    else:
+        return 'A>/ItemView [POST]</A'
+
+@app.route('/itemregist', methods=['GET', 'POST'])
+def itemregist():
+#    print(request.form['mothods'])
+    if request.method == 'GET':
+
+        Items_T = select_Items_T('id')
+        list_len = len(Items_T)
+
+        return render_template(
+            'itemregist.html',
+            list_len=list_len,Items_T=Items_T
+        )
+    
+    else:
+        
+        id = request.form['id']
+        product_no = request.form['product_no']
+        name = request.form['name']
+        picture = request.form['picture']
+
+        input_train = {
+            'id': id,
+            'product_no': product_no,
+            'name': name,
+            'picture': picture
+        }
+
+        if (id != ''): #入力確認 英数字10文字
+            print('New Data')
+
+            con = sqlite3.connect(DATABASE)
+            con.execute('REPLACE INTO Item_T (id,product_no,name,picture) VALUES(?, ?, ?, ?)',
+                        [id, product_no, name, picture])
+            con.commit()
+            con.close()
+            msg_error = '正常に更新しました'
+        else:
+            msg_error = 'TagIDフォーマットに異常があります!?'
+
+#    Items_T = [{'id':'9999', 'prooduct_no':'9999', 'name':'9999', 'picture':'999'}]
+    Items_T = select_Items_T('id')
+
+    return render_template(
+        '/itemview.html',
+        Items_T=Items_T
+    )
+    return 'A>/ItemRegist [POST]</A'
+
 @app.route('/database', methods=['GET', 'POST'])
 def database():
-
 #    print(request.form['mothods'])
-
     if request.method == 'GET':
 
         trains = select_trains('id')
@@ -56,8 +120,18 @@ def clear_id(ClearId):
 
 @app.route('/<string:ChangeId>/change', methods=['POST'])
 def change_data(ChangeId):
+    """TagID情報の変更をPOST受信の処理
+    Args:
+        ChangeId (10Byte:[0-9a-fA-Fx]): _description_
+    Returns:
+        render_template(
+        '/database.html',
+        trains=trains,input_train=input_train)
+    """
+    Request_msg = request.form['action']
 
-    print("ChangeID:",ChangeId)
+    print("ChangeID:",ChangeId," action:",Request_msg)
+
 
     trains = select_trains('id')
 
@@ -78,7 +152,6 @@ def change_data(ChangeId):
         trains=trains,input_train=input_train
     )
 
-
 @app.route('/<string:sort_order>/sort', methods=['POST'])
 def sort_order(sort_order):
     print(sort_order)
@@ -89,8 +162,8 @@ def sort_order(sort_order):
         trains = select_trains('id DESC')
     elif sort_order == 'type_up':
         trains = select_trains('type')
-#    elif sort_order == 'type_down':
-#        trains = select_trains('type DESC')
+    elif sort_order == 'type_down':
+        trains = select_trains('type DESC')
     elif sort_order == 'name_up':
         trains = select_trains('name')
     elif sort_order == 'name_down':
@@ -123,17 +196,18 @@ def register():
     length = request.form['length']
     picture = request.form['picture']
 
-    p = re.compile('[0-9a-zA-Z]+')
-    print(p.fullmatch(id).group())
-    if len(p.fullmatch(id).group()) == 10:
-        print('Length Match!!!!')
+    input_train = {
+        'id': id,
+        'type': type,
+        'name': name,
+        'length':length,
+        'picture': picture
+    }
+
+    if (result := re.compile('[0-9A-Fa-f]{10}').fullmatch(id)): #入力確認 英数字10文字
+        print('Length Match!!!!:',result.group(0))
 
         con = sqlite3.connect(DATABASE)
-#        con.execute('INSERT INTO trains VALUES(?, ?, ?, ?, ?)',
-#                [id, type, name, length, picture])
-#        con.execute("delete from trains where id = '{}'".format(id))
-#        con.execute('REPLACE INTO trains VALUES(?, ?, ?, ?, ?)',
-#                [id, type, name, length, picture])
         con.execute('REPLACE INTO trains (id,type,name,length,picture) VALUES(?, ?, ?, ?, ?)',
                     [id, type, name, length, picture])
         con.commit()
@@ -141,17 +215,9 @@ def register():
         msg_error = '正常に更新しました'
     else:
         msg_error = 'TagIDフォーマットに異常があります！？'
-        print(msg_error)
+#        print(msg_error)
 
     trains = select_trains('id')
-
-    input_train = {
-        'id': '',
-        'type': '',
-        'name': '',
-        'length': '',
-        'picture': ''
-    }
 
 #    return redirect(url_for('database'))
     return render_template(
@@ -160,10 +226,10 @@ def register():
     )
 
 def select_trains(sort_order):
-    
+
     print(sort_order)
     con = sqlite3.connect(DATABASE)
-    db_trains = con.execute('SELECT * FROM trains ORDER BY {}'.format(sort_order)).fetchall()
+    db_trains = con.execute("SELECT * FROM trains ORDER BY {}".format(sort_order)).fetchall()
     con.close()
 
     trains = []
@@ -175,5 +241,25 @@ def select_trains(sort_order):
             'length': row[3],
             'picture': row[4],
             'num': i})
+    print(trains)
 
     return trains
+
+def select_Items_T(sort_order):
+
+    print(sort_order)
+    con = sqlite3.connect(DATABASE)
+    db_Items_T = con.execute("SELECT * FROM Item_T ORDER BY {}".format(sort_order)).fetchall()
+    con.close()
+
+    Items_T = []
+    for i,row in enumerate(db_Items_T):
+        Items_T.append({
+            'id': row[0],
+            'product_no': row[1],
+            'name': row[2],
+            'picture': row[3],
+            'num': i})
+    #print(Items_T)
+
+    return Items_T

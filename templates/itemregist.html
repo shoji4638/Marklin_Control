@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <title>Item Regist</title>
+    </head>
+    <body>
+        <h2>Item Regist 入力フォーム</h2>
+        <form method="POST" action="{{ url_for('itemregist') }}">
+        <table border="1">
+            <tr>
+                <th>id</th>
+                <th>product_no</th>
+                <th>name</th>
+                <th>picture</th>
+            </tr>
+            <tr>
+                <td><input type="text" name="id" value={{ Item_T.id }}></td>
+                <td><input type="text" name="product_no" value={{ Item_T.product_no }}></td>
+                <td><input type="text" name="name" value={{ Item_T.name }}></td>
+                <td><input type="text" name="picture" value={{ Item_T.picture }}></td>
+            </tr>
+        </table>
+        <input type="submit" value="登録">
+        </form>
+    </body>
+</html>
