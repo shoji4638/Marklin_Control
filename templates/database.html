@@ -56,6 +56,7 @@
                     <button type = "Submit" name = "sort" value = "id_up" formaction="/id_up/sort">↑</button>
                     <button type = "Submit" name = "sort" value = "id_down" formaction="/id_down/sort">↓</button>
                 </th>
+                <th>品番</th>
                 <th>種別
                     <button type = "Submit" name = "sort" value = "type_up" formaction="/type_up/sort">↑</button>
                     <button type = "Submit" name = "sort" value = "type_down" formaction="/type_down/sort">↓</button>
@@ -75,10 +76,13 @@
             {% for train in trains %}
                 <tr>
                     <td>{{ train.id }}</td>
+                    <td>{{ train.product_no }}</td>
                     <td>{{ train.type }}</td>
                     <td>{{ train.name }}</td>
                     <td>{{ train.length }}</td>
-                    <td>{{ train.picture }}</td>
+                    <td>{{ train.picture }}
+                        <img src = "static/img/{{ train.picture }}" alt="[static/img/{{ train.picture }}] ???">
+                    </td>
                     <td>
                         <form method="POST" action="ClearOrChange">
                         <button type = "Submit" name = "action" value = "Del:{{ train.id }}" formaction="/{{train.id}}/clear">削除</button>
