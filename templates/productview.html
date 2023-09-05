@@ -50,11 +50,52 @@
             </div>
         </header>
     
-        {% if trains == [] %}
-            <p> 登録 機関車なし </p>
-        {% else %}
+        <h2>入力フォーム</h2>
+        <form method="POST" action="{{ url_for('product_register') }}">
+        <table border="1">
+            <tr>
+                <th>ID</th>
+                <th>ProductID</th>
+                <th>Type</th>
+                <th>名前</th>
+                <th>長さ</th>
+                <th>写真</th>
+            </tr>
+            <tr>
+                <td><input type="text" name="id" value={{ input_product.id }}></td>
+                <td><input type="text" name="ProductNo" value={{ input_product.product_no }}></td>
+                <td>
+                    {% if input_product.type == "機関車" %}
+                    <input type="radio" id="r1" name="type" value="機関車" checked><label for="r1">:機関車</label>
+                    {% else %}
+                    <input type="radio" id="r1" name="type" value="機関車"><label for="r1">:機関車</label>
+                    {% endif %}
+                    {% if input_product.type == "貨車" %}
+                    <input type="radio" id="r2" name="type" value="貨車" checked><label for="r2">:貨車</label>
+                    {% else %}
+                    <input type="radio" id="r2" name="type" value="貨車"><label for="r2">:貨車</label>
+                    {% endif %}
+                    {% if input_product.type == "客車" %}
+                    <input type="radio" id="r3" name="type" value="客車" checked><label for="r3">:客車</label>
+                    {% else %}
+                    <input type="radio" id="r3" name="type" value="客車"><label for="r3">:客車</label>
+                    {% endif %}
 
-        <h2>登録 車輛 {{ list_len }}</h2>
+                </td>
+                <td><input type="text" name="name" value={{ input_product.name }}></td>
+                <td><input type="text" name="length" value={{ input_product.length }}></td>
+                <td><input type="text" name="picture" value={{ input_product.picture }}></td>
+            </tr>
+        </table>
+        <input type="submit" value="登録">
+        </form>
+        <h3>メッセージ ->{{ msg_error }}</h3>
+
+
+        {% if trains == [] %}
+            <p> 登録 製品なし </p>
+        {% else %}
+        <h2>登録 製品 {{ list_len }}</h2>
         <form method = "POST"></form>
         <table border="1">
             <tr>

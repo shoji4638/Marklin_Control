@@ -36,7 +36,46 @@
             </div>
         </nav>
 
-        <h2>Item View ->{{ msg_error }}</h2>
+        <h2>Item View Input->{{ msg_error }}</h2>
+        <form method="POST" action="{{ url_for('ProductRegister') }}">
+        <table border="1">
+            <tr>
+                <th>TrainID</th>
+                <th>PruductNo</th>
+                <th>Type</th>
+                <th>名前</th>
+                <th>長さ</th>
+                <th>写真</th>
+            </tr>
+            <tr>
+                <td><input type="text" name="Trainid" value={{ input_train.id }}></td>
+                <td><input type="text" name="Product_no" value={{ input_train.id }}></td>
+                <td>
+                    {% if input_train.type == "機関車" %}
+                    <input type="radio" id="r1" name="type" value="機関車" checked><label for="r1">:機関車</label>
+                    {% else %}
+                    <input type="radio" id="r1" name="type" value="機関車"><label for="r1">:機関車</label>
+                    {% endif %}
+                    {% if input_train.type == "貨車" %}
+                    <input type="radio" id="r2" name="type" value="貨車" checked><label for="r2">:貨車</label>
+                    {% else %}
+                    <input type="radio" id="r2" name="type" value="貨車"><label for="r2">:貨車</label>
+                    {% endif %}
+                    {% if input_train.type == "客車" %}
+                    <input type="radio" id="r3" name="type" value="客車" checked><label for="r3">:客車</label>
+                    {% else %}
+                    <input type="radio" id="r3" name="type" value="客車"><label for="r3">:客車</label>
+                    {% endif %}
+
+                </td>
+                <td><input type="text" name="name" value={{ input_train.name }}></td>
+                <td><input type="text" name="length" value={{ input_train.length }}></td>
+                <td><input type="text" name="picture" value={{ input_train.picture }}></td>
+            </tr>
+        </table>
+        <input type="submit" value="登録">
+        </form>
+
     
         {% if trains == [] %}
             <p> 登録 機関車なし </p>

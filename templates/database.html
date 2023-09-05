@@ -5,18 +5,21 @@
         <title>データベース登録</title>
     </head>
     <body>
-        <h2>入力フォーム</h2>
+        <h2>Tagと関連付け</h2>
         <form method="POST" action="{{ url_for('register') }}">
+        <a>TagID:</a><input type="text" name="Tagid" value={{ input_train.tagid }}>
         <table border="1">
             <tr>
-                <th>ID</th>
-                <th>種別</th>
-                <th>名前</th>
-                <th>長さ</th>
-                <th>写真</th>
+                <th>TrainID</th>
+                <th>ProductNo</th>
+                <th>Type</th>
+                <th>name</th>
+                <th>length</th>
+                <th>picture</th>
             </tr>
             <tr>
-                <td><input type="text" name="id" value={{ input_train.id }}></td>
+                <td><input type="text" name="Trainid" value={{ input_train.Trainsid }}></td>
+                <td><input type="text" name="Productno" value={{ input_train.product_no }}></td>
                 <td>
                     {% if input_train.type == "機関車" %}
                     <input type="radio" id="r1" name="type" value="機関車" checked><label for="r1">:機関車</label>
@@ -33,20 +36,22 @@
                     {% else %}
                     <input type="radio" id="r3" name="type" value="客車"><label for="r3">:客車</label>
                     {% endif %}
-
                 </td>
                 <td><input type="text" name="name" value={{ input_train.name }}></td>
                 <td><input type="text" name="length" value={{ input_train.length }}></td>
-                <td><input type="text" name="picture" value={{ input_train.picture }}></td>
+                <td><input type="text" name="picture" value={{ input_train.picture }}>
+                    <img src = "static/img/{{ input_train.picture }}" alt="[static/img/{{ input_train.picture }}] ???">
+                </td>
             </tr>
         </table>
+        <input type="submit" value="検索" formmethod="post" formaction="/trainserch">
         <input type="submit" value="登録">
         </form>
         <h3>メッセージ ->{{ msg_error }}</h3>
+
         {% if trains == [] %}
             <p> 登録 機関車なし </p>
         {% else %}
-
         <h2>登録 車輛</h2>
         <form method = "POST"></form>
         <table border="1">
@@ -56,7 +61,7 @@
                     <button type = "Submit" name = "sort" value = "id_up" formaction="/id_up/sort">↑</button>
                     <button type = "Submit" name = "sort" value = "id_down" formaction="/id_down/sort">↓</button>
                 </th>
-                <th>品番</th>
+                <th>TrainID</th>
                 <th>種別
                     <button type = "Submit" name = "sort" value = "type_up" formaction="/type_up/sort">↑</button>
                     <button type = "Submit" name = "sort" value = "type_down" formaction="/type_down/sort">↓</button>
@@ -75,9 +80,9 @@
             </tr>
             {% for train in trains %}
                 <tr>
-                    <td>{{ train.id }}</td>
+                    <td>{{ train.tagid }}</td>
+                    <td>{{ train.trainid }}</td>
                     <td>{{ train.product_no }}</td>
-                    <td>{{ train.type }}</td>
                     <td>{{ train.name }}</td>
                     <td>{{ train.length }}</td>
                     <td>{{ train.picture }}

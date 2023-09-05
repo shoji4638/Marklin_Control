@@ -1,6 +1,11 @@
 #from Marklin_Control import app
 from flask import Flask,render_template, request, redirect,url_for
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import desc
+
+from db_make_table import *
+from db_setting import session
+
 #import sqlite3
 import re
 import os
@@ -10,42 +15,17 @@ DATABASE = 'marklin.db'
 main = Flask(__name__)
 #engine = create_engine("mariadb+pymysql://user:pass@some_mariadb/dbname?charset=utf8mb4")
 #main.config['SQLALCHEMY_DATABASE_URI']= 'sqlite:///marklin.db'
+#engine = create_engine("sqlite:///foo.db") # 相対パスの指定の場合
+#engine = create_engine("sqlite:////absolute/path/to/foo.db") # 絶対パスの指定の場合
+#main.config['SQLALCHEMY_DATABASE_URI']= 'sqlite:////C:\Users\s_shi\Documents\git\Marklin_Control\marklin.db'
+#main.config['SQLALCHEMY_DATABASE_URI']= 'sqlite:////C:/Users/s_shi/Documents/git/Marklin_Control/marklin.db'
 main.config['SQLALCHEMY_DATABASE_URI']= 'mariadb+pymysql://root:Shinomiya4638!@192.168.50.7/ShojiHomeDB?charset=utf8mb4'
 main.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 main.config['SQLALCHEMY_ECHO']=True
 
-db = SQLAlchemy(main)
-
-class trains_db(db.Model):
-    #con.execute('CREATE TABLE IF NOT EXISTS trains (id PRIMARY KEY, type text, name text, length integer, picture text)')
-#    __tablename__ = 'trains'
-    __tablename__ = 'Item_T'
-    id = db.Column(db.Text, primary_key=True)
-    product_no = db.Column(db.Text)
-    type = db.Column(db.Text)
-    name = db.Column(db.Text)
-    length = db.Column(db.Integer)
-    pic = db.Column(db.Text)
-
-# @main.route('/', methods=['GET'])
-# def index():
-#     datas = Shohin.query.all()
-#     return render_template('index.html', lists = datas)
-
-# @app.route('/result', methods=['POST'])
-# def insert():
-#     name_txt = request.form['name']
-#     price_txt = request.form['price']
-#     shohin = Shohin(name = name_txt, price = price_txt)
-
-#     db.session.add(shohin)
-#     db.session.commit()
-
-#     return redirect('/')
-
-# if __name__ == '__main__':
-#     app.debug = True
-#     app.run(host='localhost')
+# @main.before_request
+# def init():
+#     db.create_all()
 
 @main.route('/')
 def index():
@@ -54,18 +34,94 @@ def index():
         'index.html'
     )
 
-@main.route('/itemview', methods=['GET', 'POST'])
-def itemview():
+@main.route('/<string:ChangeId>/ProductChange', methods=['POST'])
+def ProductChange_data(ChangeId):
+
+#    Request_msg = request.form['action']
+#    print("ChangeID:",ChangeId," action:",Request_msg)
+
+    trains = select_Product_trains('id')
+    input_train = {}
+
+    # con = sqlite3.connect(DATABASE)
+    # db_trains = con.execute("SELECT * FROM trains WHERE id = '{}'".format(ChangeId)).fetchall()        
+    # input_train = {
+    #     'id': db_trains[0][0],
+    #     'type': db_trains[0][1],
+    #     'name': db_trains[0][2],
+    #     'length': db_trains[0][3],
+    #     'picture': db_trains[0][4]
+    # }
+
+    # con.close()
+
+    return render_template(
+        '/itemview.html',
+        trains=trains,input_train=input_train
+    )
+
+@main.route('/product_register', methods=['GET', 'POST'])
+def product_register():
+
+    if request.method == 'POST':
+        id = request.form['id']
+        ProductNo = request.form['ProductNo']
+        type = request.form['type']
+        name = request.form['name']
+        length = request.form['length']
+        picture = request.form['picture']
+
+        input_product = {
+            'id': id,
+            'ProductNo': ProductNo,
+            'type': type,
+            'name': name,
+            'length':length,
+            'picture': picture
+        }
+    
+        trains_db = Trains_db()
+        trains_db.id = id
+        trains_db.product_no = ProductNo
+        trains_db.type = type
+        trains_db.name = name
+        trains_db.length = length
+        trains_db.picture = picture
+        session.add(trains_db)
+        session.commit()
+        msg_error = '正常に更新しました'
+    else:
+        msg_error = 'TagIDフォーマットに異常があります！？'
+#        print(msg_error)
+
+    Items_T = select_Product_trains('id')
+    print(Items_T)
+
+#    return redirect(url_for('database'))
+    return render_template(
+        '/productview.html',
+         Items_T= Items_T, input_product= {}, msg_error= msg_error
+    )
+
+
+@main.route('/productdata', methods=['GET', 'POST'])
+def productdata():
 #    print(request.form['mothods'])
     if request.method == 'GET':
 
         #Items_T = [{'id':'123', 'prooduct_no':'ABC', 'name':'DEF', 'picture':'GHI'}]
-        Items_T = select_Items_T('id')
+        Items_T = select_Items_T('id DESC')
         list_len = len(Items_T)
 
+        input_product = {
+            'id':'0',
+            'product_no':'1234',
+            'type':'機関車'
+        }
+
         return render_template(
-            'itemview.html',
-            list_len=list_len,Items_T=Items_T
+            'productview.html',
+            list_len=list_len,Items_T=Items_T[4400:4550],input_product=input_product
         )
     
     else:
@@ -125,13 +181,19 @@ def database():
     if request.method == 'GET':
 
         trains = select_trains('id')
-            
+
+        input_trains = session.query(Trains_db). \
+            filter(Trains_db.id == "000220"). \
+            all()
+        #print(type(input_trains[0].id),input_trains[0].id)
+
         input_train = {
-            'id': '',
-            'type': '',
-            'name': '',
-            'length': '',
-            'picture': ''
+            'Trainsid': input_trains[0].id,
+            'product_no': input_trains[0].product_no,
+            'type': input_trains[0].type,
+            'name': input_trains[0].name,
+            'length': input_trains[0].length,
+            'picture': input_trains[0].picture
         }
 
         return render_template(
@@ -142,15 +204,50 @@ def database():
     else:
         return 'A>ABC</A'
 
+@main.route('/trainserch', methods=['GET', 'post'])
+def tarainserch():
+
+#    if request.method == 'POST':
+    Tagid = request.form['Tagid']
+    Trainid = request.form['Trainid']
+    product_no = request.form['Productno']
+    
+    print('Tagid:',Tagid,Trainid,product_no)
+
+    trains = select_trains('id')
+
+    input_trains = session.query(Trains_db). \
+        filter(Trains_db.id == Trainid). \
+        all()
+    print(type(input_trains[0].id),input_trains[0].id)
+
+    input_train = {
+        'Trainsid': input_trains[0].id,
+        'product_no': input_trains[0].product_no,
+        'type': input_trains[0].type,
+        'name': input_trains[0].name,
+        'length': input_trains[0].length,
+        'picture': input_trains[0].picture
+    }
+
+    return render_template(
+        'database.html',
+        trains=trains,input_train=input_train
+    )
+
 @main.route('/<string:ClearId>/clear', methods=['POST'])
 def clear_id(ClearId):
 
     print("ClearID:",ClearId)
-    con = sqlite3.connect(DATABASE)
-    db_trains = con.execute("delete from trains where id = '{}'".format(ClearId))
-#    print(db_trains)
-    con.commit()
-    con.close()
+#    con = sqlite3.connect(DATABASE)
+#    db_trains = con.execute("delete from trains where id = '{}'".format(ClearId))
+##    print(db_trains)
+#    con.commit()
+#    con.close()
+    session.query(Trains_db). \
+        filter(Trains_db.id == ClearId).delete()
+    session.commit()
+
     return redirect(url_for('database'))
 
 @main.route('/<string:ChangeId>/change', methods=['POST'])
@@ -225,28 +322,35 @@ def sort_order(sort_order):
 
 @main.route('/registar', methods=['POST'])
 def register():
-    id = request.form['id']
+    Tagid = request.form['Tagid']
+    Trainid = request.form['Trainid']
+    product_no = request.form['Productno']
     type = request.form['type']
     name = request.form['name']
     length = request.form['length']
     picture = request.form['picture']
 
     input_train = {
-        'id': id,
+        'Tagid': Tagid,
+        'Trainid': Trainid,
+        'product_no': product_no,
         'type': type,
         'name': name,
         'length':length,
         'picture': picture
     }
 
-    if (result := re.compile('[0-9A-Fa-f]{10}').fullmatch(id)): #入力確認 英数字10文字
+    print('input_train',input_train)
+
+
+    if (result := re.compile('[0-9A-Fa-f]{10}').fullmatch(Tagid)): #入力確認 英数字10文字
         print('Length Match!!!!:',result.group(0))
 
-        con = sqlite3.connect(DATABASE)
-        con.execute('REPLACE INTO trains (id,type,name,length,picture) VALUES(?, ?, ?, ?, ?)',
-                    [id, type, name, length, picture])
-        con.commit()
-        con.close()
+        item_db = Item_db()
+        item_db.Tagid = Tagid
+        item_db.Trains_id = Trainid
+        session.add(item_db)
+        session.commit()
         msg_error = '正常に更新しました'
     else:
         msg_error = 'TagIDフォーマットに異常があります！？'
@@ -260,26 +364,54 @@ def register():
         trains=trains,input_train=input_train,msg_error=msg_error
     )
 
+def select_Product_trains(sort_order):
+
+    datas = session.query(Trains_db).all()
+#    datas = session.query(Item_db.Tagid,Item_db.Trains_id,Trains_db.product_no,Trains_db.name,Trains_db.picture). \
+#        outerjoin(Trains_db, Item_db.Tagid==Trains_db.id). \
+#        all()
+#    print('datas:',type(datas),datas)
+    trains_list = []
+#    for i,row in enumerate(datas):
+    for i,row in enumerate(datas):
+#        print('i:',i,' row:',row)
+        trains_list.append({    \
+            'id': row.id,    \
+            'product_no': row.product_no,  \
+            'name': row.name,
+            'length': row.length,
+            'picture': row.picture
+            })
+#           'length': row.length,
+#            'picture': os.path.basename(row.picture),
+#            'num': i})
+    #print(trains_list)
+
+    return trains_list
+
 def select_trains(sort_order):
 
     print(sort_order)
-    # con = sqlite3.connect(DATABASE)
-    # db_trains = con.execute("SELECT * FROM trains ORDER BY {}".format(sort_order)).fetchall()
-    # con.close()
-    datas = trains_db.query.all()
-    print('datas:',type(datas),datas[0].id)
+    datas = session.query(Item_db.Tagid,Item_db.Trains_id, Trains_db.type, Trains_db.name, Trains_db.length,  Trains_db.product_no, Trains_db.picture
+        ).join(Item_db, Trains_db.id == Item_db.Trains_id)
+
+    print('datas:',type(datas),datas)
 
     trains_list = []
 #    for i,row in enumerate(datas):
     for i,row in enumerate(datas):
+        print('i:',i,' row:',row)
         trains_list.append({
-            'id': row.id,
-            'product_no': row.product_no,
-            'type': row.type,
-            'name': row.name,
-            'length': row.length,
-            'picture': os.path.basename(row.pic),
-            'num': i})
+            'tagid': row[0],
+            'trainid': row[1],
+            'type': row[2],
+            'name': row[3],
+            'length': row[4],
+            'product_no': row[5],
+            'picture': row[6]})
+#           'length': row.length,
+#            'picture': os.path.basename(row.picture),
+#            'num': i})
     #print(trains_list)
 
     return trains_list
@@ -287,9 +419,12 @@ def select_trains(sort_order):
 def select_Items_T(sort_order):
 
     print(sort_order)
-    con = sqlite3.connect(DATABASE)
-    db_Items_T = con.execute("SELECT * FROM Item_T ORDER BY {}".format(sort_order)).fetchall()
-    con.close()
+#    con = sqlite3.connect(DATABASE)
+#    db_Items_T = con.execute("SELECT * FROM Item_T ORDER BY {}".format(sort_order)).fetchall()
+#    con.close()
+    db_Items_T = session.query(Trains_db). \
+        order_by(Trains_db.id). \
+        all()
 
     Items_T = []
     for i,row in enumerate(db_Items_T):
