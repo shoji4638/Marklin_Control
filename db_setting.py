@@ -11,7 +11,7 @@ port = "3306"
 database = "ShojiHomeDB"
 charset_type = "utf8mb4"
 db_url = f"{dialect}+{driver}://{username}:{password}@{host}:{port}/{database}?charset={charset_type}"
-##mariadb+pymysql://root:Shinomiya4638!@192.168.50.7/ShojiHomeDB?charset=utf8mb4
+# ##mariadb+pymysql://root:Shinomiya4638!@192.168.50.7/ShojiHomeDB?charset=utf8mb4
 #db_url = f"sqlite:///C:/Users/s_shi/Documents/git/Marklin_Control/marklin.db"
 
 # DB接続するためのEngineインスタンス

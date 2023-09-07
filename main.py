@@ -110,7 +110,7 @@ def productdata():
     if request.method == 'GET':
 
         #Items_T = [{'id':'123', 'prooduct_no':'ABC', 'name':'DEF', 'picture':'GHI'}]
-        Items_T = select_Items_T('id DESC')
+        Items_T = select_trains_T('id DESC')
         list_len = len(Items_T)
 
         input_product = {
@@ -179,22 +179,32 @@ def itemregist():
 def database():
 #    print(request.form['mothods'])
     if request.method == 'GET':
-
         trains = select_trains('id')
-
         input_trains = session.query(Trains_db). \
             filter(Trains_db.id == "000220"). \
             all()
         #print(type(input_trains[0].id),input_trains[0].id)
 
-        input_train = {
-            'Trainsid': input_trains[0].id,
-            'product_no': input_trains[0].product_no,
-            'type': input_trains[0].type,
-            'name': input_trains[0].name,
-            'length': input_trains[0].length,
-            'picture': input_trains[0].picture
-        }
+        if input_trains != []:
+
+            input_train = {
+                'Trainsid': input_trains[0].id,
+                'product_no': input_trains[0].product_no,
+                'type': input_trains[0].type,
+                'name': input_trains[0].name,
+                'length': input_trains[0].length,
+                'picture': input_trains[0].picture
+            }
+        
+        else:
+            input_train = {
+                'Trainsid': '',
+                'product_no': '',
+                'type': '',
+                'name': '',
+                'length': '',
+                'picture': ''
+            }
 
         return render_template(
             'database.html',
@@ -208,27 +218,50 @@ def database():
 def tarainserch():
 
 #    if request.method == 'POST':
-    Tagid = request.form['Tagid']
-    Trainid = request.form['Trainid']
-    product_no = request.form['Productno']
-    
-    print('Tagid:',Tagid,Trainid,product_no)
+    Tagid = '{:0>10}'.format(request.form['Tagid'])
+    # print(type(request.form['Tagid']))
+    # if request.form['Tagid'].hexdigits == True:
+    #     Tagid = '{:06x}'.format(hex(request.form['Tagid']))
+    # else:
+    #     Tagid = ''
+    if 0 < int(Tagid, 16) and 0xFFFFFFFFFF >= int(Tagid, 16):
+        pass
+    Trainid = '{:0>6}'.format(request.form['Trainid'])
 
-    trains = select_trains('id')
+    if 0 < int(Trainid) and 100000 >= int(Trainid):
+        search_word = 'id = ' + str(int(Trainid))
+    else:
+        search_word = 'id'
+    print(search_word)
+    #product_no = request.form['Productno']
+#    print('Serch Word: ',Tagid,' :',Trainid,' :',product_no)
+
+    trains = search_trains(serch_word)
 
     input_trains = session.query(Trains_db). \
         filter(Trains_db.id == Trainid). \
         all()
-    print(type(input_trains[0].id),input_trains[0].id)
+    
+    if input_trains != []:
+        print(type(input_trains[0].id),input_trains[0].id)
+        input_train = {
+            'Trainsid': input_trains[0].id,
+            'product_no': input_trains[0].product_no,
+            'type': input_trains[0].type,
+            'name': input_trains[0].name,
+            'length': input_trains[0].length,
+            'picture': input_trains[0].picture
+        }
+    else:
+        input_train = {
+            'Trainsid': '??????',
+            'product_no': '??????',
+            'type': '',
+            'name': '??????',
+            'length': '??????',
+            'picture': '??????'
+        }
 
-    input_train = {
-        'Trainsid': input_trains[0].id,
-        'product_no': input_trains[0].product_no,
-        'type': input_trains[0].type,
-        'name': input_trains[0].name,
-        'length': input_trains[0].length,
-        'picture': input_trains[0].picture
-    }
 
     return render_template(
         'database.html',
@@ -322,13 +355,22 @@ def sort_order(sort_order):
 
 @main.route('/registar', methods=['POST'])
 def register():
-    Tagid = request.form['Tagid']
-    Trainid = request.form['Trainid']
-    product_no = request.form['Productno']
-    type = request.form['type']
-    name = request.form['name']
-    length = request.form['length']
-    picture = request.form['picture']
+    try:
+        Tagid = request.form['Tagid']
+        Trainid = request.form['Trainid']
+        product_no = request.form['Productno']
+        type = request.form['type']
+        name = request.form['name']
+        length = request.form['length']
+        picture = request.form['picture']
+    except:
+        Tagid = request.form['Tagid']
+        Trainid = request.form['Trainid']
+        product_no = request.form['Productno']
+        type = ''
+        name = request.form['name']
+        length = request.form['length']
+        picture = request.form['picture']
 
     input_train = {
         'Tagid': Tagid,
@@ -364,6 +406,32 @@ def register():
         trains=trains,input_train=input_train,msg_error=msg_error
     )
 
+def search_trains(sort_order):
+
+    datas = session.query(Trains_db).filter(Trains_db.id == '200').all()
+#    datas = session.query(Item_db.Tagid,Item_db.Trains_id,Trains_db.product_no,Trains_db.name,Trains_db.picture). \
+#        outerjoin(Trains_db, Item_db.Tagid==Trains_db.id). \
+#        all()
+#    print('datas:',type(datas),datas)
+    trains_list = []
+#    for i,row in enumerate(datas):
+    for i,row in enumerate(datas):
+#        print('i:',i,' row:',row)
+        trains_list.append({    
+            'id': row.id,    
+            'product_no': row.product_no,  
+            'name': row.name,
+            'length': row.length,
+            'picture': row.picture
+            })
+#           'length': row.length,
+#            'picture': os.path.basename(row.picture),
+#            'num': i})
+    #print(trains_list)
+
+    return trains_list
+
+
 def select_Product_trains(sort_order):
 
     datas = session.query(Trains_db).all()
@@ -386,13 +454,15 @@ def select_Product_trains(sort_order):
 #            'picture': os.path.basename(row.picture),
 #            'num': i})
     #print(trains_list)
-
     return trains_list
+
 
 def select_trains(sort_order):
 
     print(sort_order)
-    datas = session.query(Item_db.Tagid,Item_db.Trains_id, Trains_db.type, Trains_db.name, Trains_db.length,  Trains_db.product_no, Trains_db.picture
+#    datas = session.query(Item_db.Tagid, Item_db.Trains_id, Trains_db.type, Trains_db.name, Trains_db.length,  Trains_db.product_no, Trains_db.picture
+#        ).join(Item_db, Trains_db.id == Item_db.Trains_id)
+    datas = session.query(Item_db.Tagid, Item_db.Trains_id, Trains_db.type, Trains_db.name, Trains_db.length,  Trains_db.product_no, Trains_db.picture
         ).join(Item_db, Trains_db.id == Item_db.Trains_id)
 
     print('datas:',type(datas),datas)
@@ -400,7 +470,7 @@ def select_trains(sort_order):
     trains_list = []
 #    for i,row in enumerate(datas):
     for i,row in enumerate(datas):
-        print('i:',i,' row:',row)
+        print('datas[',i,']:',row)
         trains_list.append({
             'tagid': row[0],
             'trainid': row[1],
@@ -416,18 +486,18 @@ def select_trains(sort_order):
 
     return trains_list
 
-def select_Items_T(sort_order):
+def select_trains_T(sort_order):
 
+    print('Select Trains Table')
     print(sort_order)
 #    con = sqlite3.connect(DATABASE)
 #    db_Items_T = con.execute("SELECT * FROM Item_T ORDER BY {}".format(sort_order)).fetchall()
 #    con.close()
-    db_Items_T = session.query(Trains_db). \
-        order_by(Trains_db.id). \
-        all()
+#    db_trains_T = session.query().order_by(Trains_db.id).all()
+    db_trains_T = session.query(Trains_db).all()
 
     Items_T = []
-    for i,row in enumerate(db_Items_T):
+    for i,row in enumerate(db_trains_T):
         Items_T.append({
             'id': row.id,
             'product_no': row.product_no,

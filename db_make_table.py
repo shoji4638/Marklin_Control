@@ -18,11 +18,12 @@ import sys
 class Trains_db(Base):
     #con.execute('CREATE TABLE IF NOT EXISTS trains (id PRIMARY KEY, type text, name text, length integer, picture text)')
 #    __tablename__ = 'trains'
-    __tablename__ = 'trainsdb'
+    __tablename__ = 'trains_T'
     id = Column(String(16), primary_key=True)
     product_no = Column(String(10))
-    type = Column(String(16))
     name = Column(String(128))
+    maker_id = Column(Integer)
+    type = Column(String(16))
     length = Column(Integer)
     picture = Column(String(64))
 
