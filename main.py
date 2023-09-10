@@ -23,13 +23,13 @@ main.config['SQLALCHEMY_DATABASE_URI']= 'mariadb+pymysql://root:Shinomiya4638!@1
 main.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 main.config['SQLALCHEMY_ECHO']=True
 
-# @main.before_request
-# def init():
-#     db.create_all()
+#@main.before_request
+#データベース テーブル作成時に有効にして作成する
+#def init():
+#    Base.metadata.create_all(bind=ENGINE)
 
 @main.route('/')
 def index():
-
     return render_template(
         'index.html'
     )
@@ -111,7 +111,10 @@ def productdata():
 
         #Items_T = [{'id':'123', 'prooduct_no':'ABC', 'name':'DEF', 'picture':'GHI'}]
         Items_T = select_trains_T('id DESC')
+        print(Items_T)
+
         list_len = len(Items_T)
+        print(list_len)
 
         input_product = {
             'id':'0',
@@ -121,70 +124,68 @@ def productdata():
 
         return render_template(
             'productview.html',
-            list_len=list_len,Items_T=Items_T[4400:4550],input_product=input_product
+            list_len=list_len,Items_T=Items_T[0:10],input_product=input_product
         )
     
     else:
         return 'A>/ItemView [POST]</A'
 
-@main.route('/itemregist', methods=['GET', 'POST'])
-def itemregist():
-#    print(request.form['mothods'])
-    if request.method == 'GET':
+# @main.route('/itemregist', methods=['GET', 'POST'])
+# def itemregist():
+# #    print(request.form['mothods'])
+#     if request.method == 'GET':
 
-        Items_T = select_Items_T('id')
-        list_len = len(Items_T)
+#         Items_T = select_Items_T('id')
+#         list_len = len(Items_T)
 
-        return render_template(
-            'itemregist.html',
-            list_len=list_len,Items_T=Items_T
-        )
+#         return render_template(
+#             'itemregist.html',
+#             list_len=list_len,Items_T=Items_T
+#         )
     
-    else:
+#     else:
         
-        id = request.form['id']
-        product_no = request.form['product_no']
-        name = request.form['name']
-        picture = request.form['picture']
+#         id = request.form['id']
+#         product_no = request.form['product_no']
+#         name = request.form['name']
+#         picture = request.form['picture']
 
-        input_train = {
-            'id': id,
-            'product_no': product_no,
-            'name': name,
-            'picture': picture
-        }
+#         input_train = {
+#             'id': id,
+#             'product_no': product_no,
+#             'name': name,
+#             'picture': picture
+#         }
 
-        if (id != ''): #入力確認 英数字10文字
-            print('New Data')
+#         if (id != ''): #入力確認 英数字10文字
+#             print('New Data')
 
-            con = sqlite3.connect(DATABASE)
-            con.execute('REPLACE INTO Item_T (id,product_no,name,picture) VALUES(?, ?, ?, ?)',
-                        [id, product_no, name, picture])
-            con.commit()
-            con.close()
-            msg_error = '正常に更新しました'
-        else:
-            msg_error = 'TagIDフォーマットに異常があります!?'
+#             con = sqlite3.connect(DATABASE)
+#             con.execute('REPLACE INTO Item_T (id,product_no,name,picture) VALUES(?, ?, ?, ?)',
+#                         [id, product_no, name, picture])
+#             con.commit()
+#             con.close()
+#             msg_error = '正常に更新しました'
+#         else:
+#             msg_error = 'TagIDフォーマットに異常があります!?'
 
-#    Items_T = [{'id':'9999', 'prooduct_no':'9999', 'name':'9999', 'picture':'999'}]
-    Items_T = select_Items_T('id')
+# #    Items_T = [{'id':'9999', 'prooduct_no':'9999', 'name':'9999', 'picture':'999'}]
+#     Items_T = select_Items_T('id')
 
-    return render_template(
-        '/itemview.html',
-        Items_T=Items_T
-    )
-    return 'A>/ItemRegist [POST]</A'
+#     return render_template(
+#         '/itemview.html',
+#         Items_T=Items_T
+#     )
+#     return 'A>/ItemRegist [POST]</A'
 
 @main.route('/database', methods=['GET', 'POST'])
 def database():
 #    print(request.form['mothods'])
     if request.method == 'GET':
-        trains = select_trains('id')
+        ## Tag関連付け用のデータ作成
         input_trains = session.query(Trains_db). \
-            filter(Trains_db.id == "000220"). \
+            filter(Trains_db.id == "01234"). \
             all()
-        #print(type(input_trains[0].id),input_trains[0].id)
-
         if input_trains != []:
 
             input_train = {
@@ -206,6 +207,11 @@ def database():
                 'picture': ''
             }
 
+        ## TagID <-> Train関連付け用のデータリスト作成
+#        trains = select_trains(Item_db.)
+#        trains = select_trains(Item_db.Tagid)
+        trains = select_trains(Item_db.Tagid,'desc')
+
         return render_template(
             'database.html',
             trains=trains,input_train=input_train
@@ -226,21 +232,27 @@ def tarainserch():
     #     Tagid = ''
     if 0 < int(Tagid, 16) and 0xFFFFFFFFFF >= int(Tagid, 16):
         pass
-    Trainid = '{:0>6}'.format(request.form['Trainid'])
 
+    Trainid = '{:0>5}'.format(request.form['Trainid'])
     if 0 < int(Trainid) and 100000 >= int(Trainid):
-        search_word = 'id = ' + str(int(Trainid))
-    else:
-        search_word = 'id'
+#        search_word = 'id = ' + str(int(Trainid))
+        search_word = ['Trains_db.id', Trainid]
+#        search_word = Trainid
+    elif (product_no := request.form['Productno']) != '':
+#        search_word = 'Trains_db.product_no = ' + product_no
+        search_word = ['Trains_db.product_no', product_no]
     print(search_word)
     #product_no = request.form['Productno']
 #    print('Serch Word: ',Tagid,' :',Trainid,' :',product_no)
 
-    trains = search_trains(serch_word)
+    input_trains = search_trains(search_word)
 
-    input_trains = session.query(Trains_db). \
-        filter(Trains_db.id == Trainid). \
-        all()
+    trains = search_trains(search_word)
+    
+
+#    input_trains = session.query(Trains_db). \
+#        filter(Trains_db.id == Trainid). \
+#        all()
     
     if input_trains != []:
         print(type(input_trains[0].id),input_trains[0].id)
@@ -271,46 +283,61 @@ def tarainserch():
 @main.route('/<string:ClearId>/clear', methods=['POST'])
 def clear_id(ClearId):
 
-    print("ClearID:",ClearId)
+    print("ClearTagID from URL:",ClearId)
+#    print("request.form['Tagid']:",request.form['Tagid'])
 #    con = sqlite3.connect(DATABASE)
 #    db_trains = con.execute("delete from trains where id = '{}'".format(ClearId))
 ##    print(db_trains)
 #    con.commit()
 #    con.close()
-    session.query(Trains_db). \
-        filter(Trains_db.id == ClearId).delete()
+    session.query(Item_db). \
+        filter(Item_db.Tagid == ClearId).delete()
     session.commit()
 
-    return redirect(url_for('database'))
+    input_train = {
+        'id': '',
+        'type': '',
+        'name': '',
+        'length': '',
+        'picture': ''
+    }
+
+    trains = select_trains()
+#    return redirect(url_for('database'))
+    return render_template(
+        '/database.html',
+        trains=trains,input_train = input_train
+    )
+
 
 @main.route('/<string:ChangeId>/change', methods=['POST'])
 def change_data(ChangeId):
-    """TagID情報の変更をPOST受信の処理
-    Args:
-        ChangeId (10Byte:[0-9a-fA-Fx]): _description_
-    Returns:
-        render_template(
-        '/database.html',
-        trains=trains,input_train=input_train)
-    """
-    Request_msg = request.form['action']
 
-    print("ChangeID:",ChangeId," action:",Request_msg)
+    db_Item = session.query(Item_db). \
+        filter(Item_db.Tagid == ChangeId).\
+        all()
+    print('ChangeID from URL:',ChangeId,'->:',db_Item[0].Tagid,' , ',db_Item[0].Trains_id)
 
+    db_trains = session.query(Trains_db). \
+        filter(db_Item[0].Trains_id == Trains_db.id).\
+        all()
+    print('Trains_db:',type(db_trains),' : ',db_trains)
 
-    trains = select_trains('id')
-
-    con = sqlite3.connect(DATABASE)
-    db_trains = con.execute("SELECT * FROM trains WHERE id = '{}'".format(ChangeId)).fetchall()        
     input_train = {
-        'id': db_trains[0][0],
-        'type': db_trains[0][1],
-        'name': db_trains[0][2],
-        'length': db_trains[0][3],
-        'picture': db_trains[0][4]
+        'tagid': db_Item[0].Tagid,
+        'Trainsid': db_trains[0].id,
+        'product_no': db_trains[0].product_no,
+        'type': db_trains[0].type,
+        'name': db_trains[0].name,
+        'length': db_trains[0].length,
+        'picture': db_trains[0].picture
     }
 
-    con.close()
+    trains = select_trains()
+
+#    con = sqlite3.connect(DATABASE)
+#    db_trains = con.execute("SELECT * FROM trains WHERE id = '{}'".format(ChangeId)).fetchall()
+#    con.close()
 
     return render_template(
         '/database.html',
@@ -322,23 +349,31 @@ def sort_order(sort_order):
     print(sort_order)
 
     if sort_order == 'id_up':
-        trains = select_trains('id')
+        trains = select_trains(Item_db.Tagid)
     elif sort_order == 'id_down':
-        trains = select_trains('id DESC')
+        trains = select_trains(Item_db.Tagid,'desc')
+    elif sort_order == 'trainid_up':
+        trains = select_trains(Item_db.Trains_id)
+    elif sort_order == 'trainid_down':
+        trains = select_trains(Item_db.Trains_id,'desc')
+    elif sort_order == 'product_up':
+        trains = select_trains(Trains_db.product_no)
+    elif sort_order == 'product_down':
+        trains = select_trains(Trains_db.product_no,'desc')
     elif sort_order == 'type_up':
-        trains = select_trains('type')
+        trains = select_trains(Trains_db.type)
     elif sort_order == 'type_down':
-        trains = select_trains('type DESC')
+        trains = select_trains(Trains_db.type,'desc')
     elif sort_order == 'name_up':
-        trains = select_trains('name')
+        trains = select_trains(Trains_db.name)
     elif sort_order == 'name_down':
-        trains = select_trains('name DESC')
+        trains = select_trains(Trains_db.name,'desc')
     elif sort_order == 'length_up':
-        trains = select_trains('length')
+        trains = select_trains(Trains_db.length)
     elif sort_order == 'length_down':
-        trains = select_trains('length DESC')
+        trains = select_trains(Trains_db.length,'desc')
     else:
-        trains = select_trains('id')
+        trains = select_trains(Item_db.Tagid)
 
     input_train = {
         'id': '',
@@ -384,7 +419,6 @@ def register():
 
     print('input_train',input_train)
 
-
     if (result := re.compile('[0-9A-Fa-f]{10}').fullmatch(Tagid)): #入力確認 英数字10文字
         print('Length Match!!!!:',result.group(0))
 
@@ -407,27 +441,32 @@ def register():
     )
 
 def search_trains(sort_order):
-
-    datas = session.query(Trains_db).filter(Trains_db.id == '200').all()
-#    datas = session.query(Item_db.Tagid,Item_db.Trains_id,Trains_db.product_no,Trains_db.name,Trains_db.picture). \
-#        outerjoin(Trains_db, Item_db.Tagid==Trains_db.id). \
-#        all()
-#    print('datas:',type(datas),datas)
+#    datas = session.query(Trains_db).filter(Trains_db.id == '200').all()   #OK
+#    datas = session.query(Trains_db).filter(sort_order).all()   #NG
+#    datas = session.query(Trains_db).filter(Trains_db.id == sort_order).all() #OK
+#    datas = session.query(Trains_db).filter(sort_order[0] == sort_order[1]).all() #OK
+    datas = session.query(Item_db.Tagid,Item_db.Trains_id,Trains_db.product_no,Trains_db.name,Trains_db.picture). \
+        outerjoin(Trains_db, Item_db.Tagid==Trains_db.id). \
+        all()
     trains_list = []
 #    for i,row in enumerate(datas):
-    for i,row in enumerate(datas):
-#        print('i:',i,' row:',row)
-        trains_list.append({    
-            'id': row.id,    
-            'product_no': row.product_no,  
-            'name': row.name,
-            'length': row.length,
-            'picture': row.picture
-            })
-#           'length': row.length,
-#            'picture': os.path.basename(row.picture),
-#            'num': i})
-    #print(trains_list)
+    try:
+        for i,row in enumerate(datas):
+    #        print('i:',i,' row:',row)
+            trains_list.append({    
+                'id': row.id,    
+                'product_no': row.product_no,  
+                'name': row.name,
+                'length': row.length,
+                'picture': row.picture
+                })
+    #           'length': row.length,
+    #            'picture': os.path.basename(row.picture),
+    #            'num': i})
+        #print(trains_list)
+    except:
+        print('datas:',type(datas),datas)
+        trains_list = []
 
     return trains_list
 
@@ -457,13 +496,24 @@ def select_Product_trains(sort_order):
     return trains_list
 
 
-def select_trains(sort_order):
+def select_trains(sort_order = Item_db.Tagid,updown = ''):
 
     print(sort_order)
-#    datas = session.query(Item_db.Tagid, Item_db.Trains_id, Trains_db.type, Trains_db.name, Trains_db.length,  Trains_db.product_no, Trains_db.picture
-#        ).join(Item_db, Trains_db.id == Item_db.Trains_id)
-    datas = session.query(Item_db.Tagid, Item_db.Trains_id, Trains_db.type, Trains_db.name, Trains_db.length,  Trains_db.product_no, Trains_db.picture
-        ).join(Item_db, Trains_db.id == Item_db.Trains_id)
+    #    datas = session.query(Item_db.Tagid, Item_db.Trains_id, Trains_db.type, Trains_db.name, Trains_db.length,  Trains_db.product_no, Trains_db.picture
+    #        ).join(Item_db, Trains_db.id == Item_db.Trains_id)
+    # if sort_order == 'Item_db.Tagid':
+    #     datas = session.query(Item_db.Tagid, Item_db.Trains_id, Trains_db.type, Trains_db.name, Trains_db.length,  Trains_db.product_no, Trains_db.picture
+    #         ).join(Item_db, Trains_db.id == Item_db.Trains_id).order_by(Item_db.Tagid)
+    # elif sort_order == 'Item_db.Trains_id':
+    #     datas = session.query(Item_db.Tagid, Item_db.Trains_id, Trains_db.type, Trains_db.name, Trains_db.length,  Trains_db.product_no, Trains_db.picture
+    #         ).join(Item_db, Trains_db.id == Item_db.Trains_id).order_by(Item_db.Trains_id)
+    if updown == '':
+        datas = session.query(Item_db.Tagid, Item_db.Trains_id, Trains_db.type, Trains_db.name, Trains_db.length,  Trains_db.product_no, Trains_db.picture
+            ).join(Item_db, Trains_db.id == Item_db.Trains_id).order_by(sort_order)
+    else:
+        datas = session.query(Item_db.Tagid, Item_db.Trains_id, Trains_db.type, Trains_db.name, Trains_db.length,  Trains_db.product_no, Trains_db.picture
+            ).join(Item_db, Trains_db.id == Item_db.Trains_id).order_by(desc(sort_order))
+
 
     print('datas:',type(datas),datas)
 

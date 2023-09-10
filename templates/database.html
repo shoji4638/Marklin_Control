@@ -5,11 +5,11 @@
         <title>データベース登録</title>
     </head>
     <body>
-        <h2>Tagと関連付け</h2>
+        <h2>TagとTrainIDの関連付け</h2>
         <form method="POST" action="{{ url_for('register') }}">
-        <a>TagID:</a><input type="text" name="Tagid" value={{ input_train.tagid }}>
         <table border="1">
             <tr>
+                <th>TagID</th>
                 <th>TrainID</th>
                 <th>ProductNo</th>
                 <th>Type</th>
@@ -18,6 +18,7 @@
                 <th>picture</th>
             </tr>
             <tr>
+                <td><input type="text" name="Tagid" value={{ input_train.tagid }}></td>
                 <td><input type="text" name="Trainid" value={{ input_train.Trainsid }}></td>
                 <td><input type="text" name="Productno" value={{ input_train.product_no }}></td>
                 <td>
@@ -40,7 +41,7 @@
                 <td><input type="text" name="name" value={{ input_train.name }}></td>
                 <td><input type="text" name="length" value={{ input_train.length }}></td>
                 <td><input type="text" name="picture" value={{ input_train.picture }}>
-                    <img src = "static/img/{{ input_train.picture }}" alt="[static/img/{{ input_train.picture }}] ???">
+                    <img src = "/static/img/{{ input_train.picture }} alt="[static/img/{{ input_train.picture }}] ???">
                 </td>
             </tr>
         </table>
@@ -57,25 +58,36 @@
         <table border="1">
             <tr>
                 <form method="POST" action="sort">
-                <th>TagID
+                <th>TagID<br>
                     <button type = "Submit" name = "sort" value = "id_up" formaction="/id_up/sort">↑</button>
                     <button type = "Submit" name = "sort" value = "id_down" formaction="/id_down/sort">↓</button>
                 </th>
-                <th>TrainID</th>
-                <th>種別
-                    <button type = "Submit" name = "sort" value = "type_up" formaction="/type_up/sort">↑</button>
-                    <button type = "Submit" name = "sort" value = "type_down" formaction="/type_down/sort">↓</button>
+                <th>TrainID<br>
+                    <button type = "Submit" name = "sort" value = "trainid_up" formaction="/trainid_up/sort">↑</button>
+                    <button type = "Submit" name = "sort" value = "trainid_down" formaction="/trainid_down/sort">↓</button>
                 </th>
-                <th>名前
+                <th>ProductNo<br>
+                    <button type = "Submit" name = "sort" value = "product_up" formaction="/product_up/sort">↑</button>
+                    <button type = "Submit" name = "sort" value = "product_down" formaction="/product_down/sort">↓</button>
+                </th>
+                <th>type
+                    <button type = "Submit" name = "sort" value = "type_up" formaction="/type_up/sort">↑</button>
+                    <button type = "Submit" name = "sort" value = "type_down" formaction="/type_down/sort">↓</button><br>
+                    <input type="checkbox" id="c1" name="機関車" checked><label for="r1">:機関車</label><br>
+                    <input type="checkbox" id="c2" name="貨車" checked><label for="r2">:貨車</label>
+                    <input type="checkbox" id="c3" name="客車" checked><label for="r3">:客車</label>
+                </th>
+                <th>name<br>
                     <button type = "Submit" name = "sort" value = "name_up" formaction="/name_up/sort">↑</button>
                     <button type = "Submit" name = "sort" value = "name_down" formaction="/name_down/sort">↓</button>
                 </th>
-                <th>長さ
+                <th>length<br>
                     <button type = "Submit" name = "sort" value = "length_up" formaction="/length_up/sort">↑</button>
                     <button type = "Submit" name = "sort" value = "length_down" formaction="/length_down/sort">↓</button>
-                </th>            
-                <th>画像</th>            
-                <th>操作</th>
+                </th>
+                <th>picture</th>            
+                <th>control</th>
+                    <br></th>
                 </form>
             </tr>
             {% for train in trains %}
@@ -83,15 +95,16 @@
                     <td>{{ train.tagid }}</td>
                     <td>{{ train.trainid }}</td>
                     <td>{{ train.product_no }}</td>
+                    <td>{{ train.type }}</td>
                     <td>{{ train.name }}</td>
                     <td>{{ train.length }}</td>
                     <td>{{ train.picture }}
-                        <img src = "static/img/{{ train.picture }}" alt="[static/img/{{ train.picture }}] ???">
+                        <img src = "C:\Users\s_shi\Documents\git\Marklin_Control\static\img\23.jpg" alt="[static/img/{{ train.picture }}] ???">
                     </td>
                     <td>
                         <form method="POST" action="ClearOrChange">
-                        <button type = "Submit" name = "action" value = "Del:{{ train.id }}" formaction="/{{train.id}}/clear">削除</button>
-                        <button type = "Submit" name = "change" value = "Chg:{{ train.id }}" formaction="/{{train.id}}/change">変更</button>
+                        <button type = "Submit" name = "action" value = "Del:{{ train.tagid }}" formaction="/{{train.tagid}}/clear">削除</button>
+                        <button type = "Submit" name = "change" value = "Chg:{{ train.tagid }}" formaction="/{{train.tagid}}/change">変更</button>
                         </form>
                     </td>
                 </tr>
