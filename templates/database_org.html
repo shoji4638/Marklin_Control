@@ -1,65 +1,19 @@
 {% extends "bootstrap/base.html" %}
 
-{% block head %}
-    {% block title %}{% endblock %}
+{% block title %}Shoji@ Märklin{% endblock %}
 
-    {%- block metas %}
-    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="" />
-    <meta name="author" content="" />
-    {%- endblock metas %}
+{% block navigation %}
+<li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ url_for('index')}}">Home</a></li>
+<li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="about.html">About</a></li>
+<li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ url_for('database')}}">DataBase</a></li>
+<li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ url_for('productdata')}}">ProductData</a></li>
+{% endblock %}
 
-    {%- block styles %}
-    <!-- Bootstrap -->
-    <!-- <link href="{{bootstrap_find_resource('css/bootstrap.css', cdn='bootstrap')}}" rel="stylesheet"> -->
-
-    <link rel="icon" type="image/x-icon"
-    href="{{ url_for('static', filename='assets/favicon.ico') }} "/>
-    <!-- Font Awesome icons (free version)-->
-    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-    <!-- Google fonts-->
-    <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css" />
-    <!-- Core theme CSS (includes Bootstrap)-->
-    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet" />
-
-    {%- endblock styles %}
-{%- endblock head %}
-
-{% block navbar %}
-
-        <!-- Navigation-->
-        <nav class="navbar navbar-expand-lg navbar-light" id="mainNav">
-            <div class="container bg-secondary px-4 px-lg-5">
-                <a class="navbar-brand">Database@ Shoji@ Märklin</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-                    Menu
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarResponsive">
-                    <ul class="navbar-nav ms-auto py-4 py-lg-0">
-                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ url_for('index')}}">Home</a></li>
-                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="about.html">About</a></li>
-                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ url_for('database')}}">DataBase</a></li>
-                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ url_for('productdata')}}">ProductData</a></li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-{% endblock navbar %}
-
-{% block content %}
-<!-- <header class="masthead"
-style="background-image: url{{ url_for('static', filename='assets/img/home-bg.jpg') }}"> -->
-
-<div class="container border bg-secondary">
-    <br>
-    <br>
-    <br>
-    <h2>TagとTrainIDの関連付け</h2>
-    <form method="POST" action="{{ url_for('register') }}">
+<title>データベース登録</title>
+    </head>
+    <body>
+        <h2>TagとTrainIDの関連付け</h2>
+        <form method="POST" action="{{ url_for('register') }}">
         <table border="1">
             <tr>
                 <th>TagID</th>
@@ -98,7 +52,6 @@ style="background-image: url{{ url_for('static', filename='assets/img/home-bg.jp
                 </td>
             </tr>
         </table>
-
         <input type="submit" value="検索" formmethod="post" formaction="/trainserch">
         <input type="submit" value="登録">
         </form>
@@ -165,30 +118,5 @@ style="background-image: url{{ url_for('static', filename='assets/img/home-bg.jp
             {% endfor %}
         </table>
         {% endif %}
-</div>
-
-
-<!-- </div> -->
-
-<!-- </header> -->
-        <!-- Page Header-->
-        <!-- <header class="masthead"
-
-            style="background-image: url{{ url_for('static', filename='assets/img/home-bg.jpg') }}">
-            <div class="container position-relative px-4 px-lg-5">
-                <div class="row gx-4 gx-lg-5 justify-content-center">
-                    <div class="col-md-10 col-lg-8 col-xl-7">
-                        <div class="site-heading">
-                            <h1>Shoji@ Märklin</h1>
-                            <span class="subheading">Shoji@ Märklin SYSTEM by Start Bootstrap</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header> -->
-
-
-{% endblock content %}
-
-<!-- Footer-->
-{% block footer %}TOP画面へ{% endblock %}
+    </body>
+</html>

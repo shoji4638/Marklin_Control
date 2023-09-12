@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8" />
+    </head>
+    <body>
+        <h2>入力フォーム</h2>
+        <form method="POST" action="{{ url_for('product_register') }}">
+        <table border="1">
+            <tr>
+                <th>ID</th>
+                <th>ProductID</th>
+                <th>Type</th>
+                <th>名前</th>
+                <th>長さ</th>
+                <th>写真</th>
+            </tr>
+            <tr>
+                <td><input type="text" name="id" value={{ input_product.id }}></td>
+                <td><input type="text" name="ProductNo" value={{ input_product.product_no }}></td>
+                <td>
+                    {% if input_product.type == "機関車" %}
+                    <input type="radio" id="r1" name="type" value="機関車" checked><label for="r1">:機関車</label>
+                    {% else %}
+                    <input type="radio" id="r1" name="type" value="機関車"><label for="r1">:機関車</label>
+                    {% endif %}
+                    {% if input_product.type == "貨車" %}
+                    <input type="radio" id="r2" name="type" value="貨車" checked><label for="r2">:貨車</label>
+                    {% else %}
+                    <input type="radio" id="r2" name="type" value="貨車"><label for="r2">:貨車</label>
+                    {% endif %}
+                    {% if input_product.type == "客車" %}
+                    <input type="radio" id="r3" name="type" value="客車" checked><label for="r3">:客車</label>
+                    {% else %}
+                    <input type="radio" id="r3" name="type" value="客車"><label for="r3">:客車</label>
+                    {% endif %}
+                </td>
+                <td><input type="text" name="name" value={{ input_product.name }}></td>
+                <td><input type="text" name="length" value={{ input_product.length }}></td>
+                <td><input type="text" name="picture" value={{ input_product.picture }}></td>
+            </tr>
+        </table>
+        <input type="submit" value="登録">
+        </form>
+        <h3>メッセージ ->{{ msg_error }}</h3>
+
+
+        {% if trains == [] %}
+            <p> 登録 製品なし </p>
+        {% else %}
+        <h2>登録 製品 {{ list_len }}</h2>
+        <form method = "POST"></form>
+        <table border="1">
+            <tr>
+                <form method="POST" action="sort">
+                <th>id
+                    <button type = "Submit" name = "sort" value = "id_up" formaction="/id_up/sort">↑</button>
+                    <button type = "Submit" name = "sort" value = "id_down" formaction="/id_down/sort">↓</button>
+                </th>
+                <th>product_no
+                    <button type = "Submit" name = "sort" value = "type_up" formaction="/type_up/sort">↑</button>
+                    <button type = "Submit" name = "sort" value = "type_down" formaction="/type_down/sort">↓</button>
+                </th>
+                <th>name
+                    <button type = "Submit" name = "sort" value = "name_up" formaction="/name_up/sort">↑</button>
+                    <button type = "Submit" name = "sort" value = "name_down" formaction="/name_down/sort">↓</button>
+                </th>
+                <th>picture</th>
+                <th>操作</th>
+                </form>
+            </tr>
+            {% for Item_T in Items_T %}
+                <tr>
+                    <td>{{ Item_T.id }}</td>
+                    <td>{{ Item_T.product_no }}</td>
+                    <td>{{ Item_T.name }}</td>
+                    <td><!--<img src = "{{ url_for('static', filename='img/{{ Item_T.picture }}')}}" alt="{{ url_for('static', filename='img/default.jpg')}}">-->
+                        <img src = "static/img/{{ Item_T.picture }}" alt="[static/img/{{ Item_T.picture }}] ???">
+                    </td>
+                    <td>
+                        <form method="POST" action="ItemClrChg">
+                        <button type = "Submit" name = "action" value = "Del:{{ Item_T.id }}" formaction="/{{Item_T.id}}/ProductClear">削除</button>
+                        <button type = "Submit" name = "change" value = "Chg:{{ Item_T.id }}" formaction="/{{Item_T.id}}/ProductChange">変更</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+    </body>
+</html>

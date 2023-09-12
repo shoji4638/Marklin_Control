@@ -1,6 +1,7 @@
 #from Marklin_Control import app
 from flask import Flask,render_template, request, redirect,url_for
 from flask_sqlalchemy import SQLAlchemy
+from flask_bootstrap import Bootstrap
 from sqlalchemy import desc
 
 from db_make_table import *
@@ -23,6 +24,8 @@ main.config['SQLALCHEMY_DATABASE_URI']= 'mariadb+pymysql://root:Shinomiya4638!@1
 main.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 main.config['SQLALCHEMY_ECHO']=True
 
+bootstrap = Bootstrap(main)
+
 #@main.before_request
 #データベース テーブル作成時に有効にして作成する
 #def init():
@@ -33,6 +36,11 @@ def index():
     return render_template(
         'index.html'
     )
+
+@main.route('/bootstrap')
+def bootstrap():
+    return render_template('bootstrap.html')
+
 
 @main.route('/<string:ChangeId>/ProductChange', methods=['POST'])
 def ProductChange_data(ChangeId):
@@ -540,19 +548,40 @@ def select_trains_T(sort_order):
 
     print('Select Trains Table')
     print(sort_order)
-#    con = sqlite3.connect(DATABASE)
-#    db_Items_T = con.execute("SELECT * FROM Item_T ORDER BY {}".format(sort_order)).fetchall()
-#    con.close()
+
 #    db_trains_T = session.query().order_by(Trains_db.id).all()
-    db_trains_T = session.query(Trains_db).all()
+    #db_trains_T = session.query(Trains_db).all()
+    #db_trains_T = session.query(Trains_db.id, Trains_db.product_no, Maker_db.id, Maker_db.maker_name,   Trains_db.type, Trains_db.name, Trains_db.length, Trains_db.picture
+    #    ).join(Trains_db, Trains_db.maker_id == Maker_db.id).order_by(desc(sort_order))
+
+    # db_trains_T = session.query(
+    #     Trains_db.id, Trains_db.product_no, Maker_db.id, Maker_db.maker_name,Trains_db.type,
+    #     Trains_db.type2, Trains_db.type3, Trains_db.name, Trains_db.name_d, Trains_db.length,
+    #     Trains_db.picture, Type_db.id
+    #         ).join(Trains_db, Trains_db.maker_id == Maker_db.id
+    #         ).join(Trains_db, Trains_db.type == Type_db.id)
+    db_trains_T = session.query(
+        Trains_db.id, Trains_db.product_no, Maker_db.id, Maker_db.maker_name,Trains_db.type,
+        Trains_db.type2, Trains_db.type3, Trains_db.name, Trains_db.name_d, Trains_db.length,
+        Trains_db.picture
+            ).join(Maker_db, Trains_db.maker_id == Maker_db.id
+            ).join(Type_db, Trains_db.type == Type_db.id)
 
     Items_T = []
     for i,row in enumerate(db_trains_T):
         Items_T.append({
-            'id': row.id,
-            'product_no': row.product_no,
-            'name': row.name,
-            'picture': row.picture,
+            'id': row[0],
+            'product_no': row[1],
+            'maker_id': row[2],
+            'maker_name': row[3],
+            'type': row[4],
+            'type2': row[5],
+            'type3': row[6],
+            'name': row[7],
+            'name_d': row[8],
+            'length': row[9],
+            'picture': row[10],
+            'type_db': 999,
             'num': i})
     #print(Items_T)
 

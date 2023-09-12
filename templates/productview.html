@@ -1,91 +1,91 @@
-<!DOCTYPE html>
-<html lang="ja">
-    <head>
+{% extends "bootstrap/base.html" %}
+
+{% block html %}
+    {%- block head %}
+        {% block title %}{% endblock %}
+
+        {%- block metas %}
+        <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
         <meta charset="utf-8" />
-    </head>
-    <body>
-        <h2>入力フォーム</h2>
-        <form method="POST" action="{{ url_for('product_register') }}">
-        <table border="1">
-            <tr>
-                <th>ID</th>
-                <th>ProductID</th>
-                <th>Type</th>
-                <th>名前</th>
-                <th>長さ</th>
-                <th>写真</th>
-            </tr>
-            <tr>
-                <td><input type="text" name="id" value={{ input_product.id }}></td>
-                <td><input type="text" name="ProductNo" value={{ input_product.product_no }}></td>
-                <td>
-                    {% if input_product.type == "機関車" %}
-                    <input type="radio" id="r1" name="type" value="機関車" checked><label for="r1">:機関車</label>
-                    {% else %}
-                    <input type="radio" id="r1" name="type" value="機関車"><label for="r1">:機関車</label>
-                    {% endif %}
-                    {% if input_product.type == "貨車" %}
-                    <input type="radio" id="r2" name="type" value="貨車" checked><label for="r2">:貨車</label>
-                    {% else %}
-                    <input type="radio" id="r2" name="type" value="貨車"><label for="r2">:貨車</label>
-                    {% endif %}
-                    {% if input_product.type == "客車" %}
-                    <input type="radio" id="r3" name="type" value="客車" checked><label for="r3">:客車</label>
-                    {% else %}
-                    <input type="radio" id="r3" name="type" value="客車"><label for="r3">:客車</label>
-                    {% endif %}
-                </td>
-                <td><input type="text" name="name" value={{ input_product.name }}></td>
-                <td><input type="text" name="length" value={{ input_product.length }}></td>
-                <td><input type="text" name="picture" value={{ input_product.picture }}></td>
-            </tr>
-        </table>
-        <input type="submit" value="登録">
-        </form>
-        <h3>メッセージ ->{{ msg_error }}</h3>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        {%- endblock metas %}
+
+        {%- block styles %}
+        <!-- Bootstrap -->
+        <!-- <link href="{{bootstrap_find_resource('css/bootstrap.css', cdn='bootstrap')}}" rel="stylesheet"> -->
+
+        <link rel="icon" type="image/x-icon"
+        href="{{ url_for('static', filename='assets/favicon.ico') }} "/>
+        <!-- Font Awesome icons (free version)-->
+        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+        <!-- Google fonts-->
+        <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet" />
+        {%- endblock styles %}
+    {%- endblock head %}
 
 
-        {% if trains == [] %}
-            <p> 登録 製品なし </p>
-        {% else %}
-        <h2>登録 製品 {{ list_len }}</h2>
-        <form method = "POST"></form>
-        <table border="1">
-            <tr>
-                <form method="POST" action="sort">
-                <th>id
-                    <button type = "Submit" name = "sort" value = "id_up" formaction="/id_up/sort">↑</button>
-                    <button type = "Submit" name = "sort" value = "id_down" formaction="/id_down/sort">↓</button>
-                </th>
-                <th>product_no
-                    <button type = "Submit" name = "sort" value = "type_up" formaction="/type_up/sort">↑</button>
-                    <button type = "Submit" name = "sort" value = "type_down" formaction="/type_down/sort">↓</button>
-                </th>
-                <th>name
-                    <button type = "Submit" name = "sort" value = "name_up" formaction="/name_up/sort">↑</button>
-                    <button type = "Submit" name = "sort" value = "name_down" formaction="/name_down/sort">↓</button>
-                </th>
-                <th>picture</th>
-                <th>操作</th>
-                </form>
-            </tr>
-            {% for Item_T in Items_T %}
-                <tr>
-                    <td>{{ Item_T.id }}</td>
-                    <td>{{ Item_T.product_no }}</td>
-                    <td>{{ Item_T.name }}</td>
-                    <td><!--<img src = "{{ url_for('static', filename='img/{{ Item_T.picture }}')}}" alt="{{ url_for('static', filename='img/default.jpg')}}">-->
-                        <img src = "static/img/{{ Item_T.picture }}" alt="[static/img/{{ Item_T.picture }}] ???">
-                    </td>
-                    <td>
-                        <form method="POST" action="ItemClrChg">
-                        <button type = "Submit" name = "action" value = "Del:{{ Item_T.id }}" formaction="/{{Item_T.id}}/ProductClear">削除</button>
-                        <button type = "Submit" name = "change" value = "Chg:{{ Item_T.id }}" formaction="/{{Item_T.id}}/ProductChange">変更</button>
-                        </form>
-                    </td>
-                </tr>
-            {% endfor %}
-        </table>
-        {% endif %}
-    </body>
-</html>
+    {% block navbar %}
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-light bg-secondary" id="mainNav">
+        <div class="container px-0 px-lg-1">
+            <a class="navbar-brand"> Shoji@ Märklin</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ms-auto py-4 py-lg-2">
+                    <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ url_for('index')}}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ url_for('database')}}">DataBase</a></li>
+                    <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ url_for('productdata')}}">ProductData</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% endblock navbar %}
+
+    {% block content %}
+    <div class="container-fluid bg-secondary"> 
+    <div class="container text-white">
+        <div class="row">
+            <div class="col-md-12"></div>
+            <br>
+            <br>
+            <br>
+            <br>
+        <div class="row row-cols-2">
+        {% for Item_T in Items_T %}
+        <!-- <div class="row-cols-2">
+            <div class="col">[{{ Item_T.id }}]</div>
+            <div class="col">{{ Item_T.maker_name }}:{{ Item_T.product_no }}</div>
+            <div class="col">{{ Item_T.type }}</div>
+            <div class="col">{{ Item_T.name }}</div>
+        </div> -->
+
+            <div class="col.col-md-4">
+                <a>[{{ Item_T.id }}]</a>
+                <a>{{ Item_T.maker_name }}:{{ Item_T.product_no }}</a><br>
+            <!-- <div class="col-md-3"> -->
+                <a>{{ Item_T.name }}</a><br>
+                <a>{{ Item_T.name_d }}</a><br>
+            <!-- <div class="col-md-3"> -->
+                <a>Type:{{ Item_T.type }}</a>
+                <a> db:{{ Item_T.type_db }}</a>
+                <a>Type2:{{ Item_T.type2 }}</a>
+                <a>Type3:{{ Item_T.type3 }}</a>
+                <a>pic:{{ Item_T.picture }}</a>
+            </div>
+            <div class="col.col-md-4">
+                <img src="/static/img/{{ Item_T.picture }}" class="img-fluid" alt="">
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+    </div>
+    {% endblock content %}
+{%- endblock html %}
