@@ -2,7 +2,10 @@
 from flask import Flask,render_template, request, redirect,url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_bootstrap import Bootstrap
+from flask_paginate import Pagination, get_page_parameter
 from sqlalchemy import desc
+
+from PIL import Image
 
 from db_make_table import *
 from db_setting import session
@@ -121,6 +124,10 @@ def productdata():
         Items_T = select_trains_T('id DESC')
         print(Items_T)
 
+        page = request.args.get(get_page_parameter(), type=int, default=1)
+        res = Items_T[(page - 1)*10: page*10]
+        pagination = Pagination(page=page, total=len(Items_T),  per_page=10, css_framework='bootstrap5')
+
         list_len = len(Items_T)
         print(list_len)
 
@@ -130,13 +137,38 @@ def productdata():
             'type':'機関車'
         }
 
-        return render_template(
-            'productview.html',
-            list_len=list_len,Items_T=Items_T[0:10],input_product=input_product
-        )
+        return render_template('productview.html',
+            rows=res, pagination=pagination, list_len=list_len, Items_T=res)
+        # return render_template(
+        #     'productview.html',
+        #     list_len=list_len,Items_T=Items_T[0:10],input_product=input_product
+        # )
     
     else:
         return 'A>/ItemView [POST]</A'
+
+
+@main.route('/productdata/<string:infoid>/productinfo', methods=['GET', 'POST'])
+def productinfo(infoid):
+#    print(request.form['mothods'])
+    if request.method == 'GET':
+
+        print('Infoid:[',infoid,'] ->')
+        Items_T = select_trains_T(where = infoid)
+
+        print('Items_T:',Items_T[0])
+
+        # print('カレントDir：',os.getcwd())
+        img = Image.open(os.path.join(os.getcwd(), 'static/img/', Items_T[0]['picture']))
+        print('im.size:',img.size)
+        # print(type(im.size))
+
+        return render_template('productdetail.html',
+            Items_T = Items_T, imgsize = img.size)
+
+    else:
+        return 'A>ABC</A'
+
 
 # @main.route('/itemregist', methods=['GET', 'POST'])
 # def itemregist():
@@ -189,6 +221,7 @@ def productdata():
 @main.route('/database', methods=['GET', 'POST'])
 def database():
 #    print(request.form['mothods'])
+    #print('url_data',url_data)
     if request.method == 'GET':
         ## Tag関連付け用のデータ作成
         input_trains = session.query(Trains_db). \
@@ -218,7 +251,7 @@ def database():
         ## TagID <-> Train関連付け用のデータリスト作成
 #        trains = select_trains(Item_db.)
 #        trains = select_trains(Item_db.Tagid)
-        trains = select_trains(Item_db.Tagid,'desc')
+        trains = select_trains(Item_db.Tagid,'','desc')
 
         return render_template(
             'database.html',
@@ -227,6 +260,50 @@ def database():
     
     else:
         return 'A>ABC</A'
+
+
+@main.route('/database/<string:info_data>/info', methods=['GET', 'POST'])
+def database_info(info_data):
+
+    print(info_data)
+
+    if request.method == 'GET':
+        ## Tag関連付け用のデータ作成
+        input_trains = session.query(Trains_db). \
+            filter(Trains_db.id == "01234"). \
+            all()
+        if input_trains != []:
+
+            input_train = {
+                'Trainsid': input_trains[0].id,
+                'product_no': input_trains[0].product_no,
+                'type': input_trains[0].type,
+                'name': input_trains[0].name,
+                'length': input_trains[0].length,
+                'picture': input_trains[0].picture
+            }
+        
+        else:
+            input_train = {
+                'Trainsid': '',
+                'product_no': '',
+                'type': '',
+                'name': '',
+                'length': '',
+                'picture': ''
+            }
+
+        trains = select_trains(Item_db.Tagid,Item_db.Tagid,'desc')
+
+        return render_template(
+            'database.html',
+            trains=trains,input_train=input_train
+        )
+
+    else:
+        return 'P>ABC</P'
+
+
 
 @main.route('/trainserch', methods=['GET', 'post'])
 def tarainserch():
@@ -504,7 +581,7 @@ def select_Product_trains(sort_order):
     return trains_list
 
 
-def select_trains(sort_order = Item_db.Tagid,updown = ''):
+def select_trains(sort_order = Item_db.Tagid,filter_data = '',updown = ''):
 
     print(sort_order)
     #    datas = session.query(Item_db.Tagid, Item_db.Trains_id, Trains_db.type, Trains_db.name, Trains_db.length,  Trains_db.product_no, Trains_db.picture
@@ -515,7 +592,10 @@ def select_trains(sort_order = Item_db.Tagid,updown = ''):
     # elif sort_order == 'Item_db.Trains_id':
     #     datas = session.query(Item_db.Tagid, Item_db.Trains_id, Trains_db.type, Trains_db.name, Trains_db.length,  Trains_db.product_no, Trains_db.picture
     #         ).join(Item_db, Trains_db.id == Item_db.Trains_id).order_by(Item_db.Trains_id)
-    if updown == '':
+    if filter_data != '':
+        datas = session.query(Item_db.Tagid, Item_db.Trains_id, Trains_db.type, Trains_db.name, Trains_db.length,  Trains_db.product_no, Trains_db.picture
+            ).join(Item_db, Trains_db.id == Item_db.Trains_id).filter(Item_db.Tagid == filter_data).order_by(sort_order)
+    elif updown == '':
         datas = session.query(Item_db.Tagid, Item_db.Trains_id, Trains_db.type, Trains_db.name, Trains_db.length,  Trains_db.product_no, Trains_db.picture
             ).join(Item_db, Trains_db.id == Item_db.Trains_id).order_by(sort_order)
     else:
@@ -544,10 +624,10 @@ def select_trains(sort_order = Item_db.Tagid,updown = ''):
 
     return trains_list
 
-def select_trains_T(sort_order):
+def select_trains_T(sort_order = '', where = ''):
 
-    print('Select Trains Table')
-    print(sort_order)
+    print('Select Trains Table!!!!!!!!!!!!!!!')
+    print('Sort_order:',sort_order,'Where:',where)
 
 #    db_trains_T = session.query().order_by(Trains_db.id).all()
     #db_trains_T = session.query(Trains_db).all()
@@ -560,12 +640,37 @@ def select_trains_T(sort_order):
     #     Trains_db.picture, Type_db.id
     #         ).join(Trains_db, Trains_db.maker_id == Maker_db.id
     #         ).join(Trains_db, Trains_db.type == Type_db.id)
-    db_trains_T = session.query(
-        Trains_db.id, Trains_db.product_no, Maker_db.id, Maker_db.maker_name,Trains_db.type,
-        Trains_db.type2, Trains_db.type3, Trains_db.name, Trains_db.name_d, Trains_db.length,
-        Trains_db.picture
-            ).join(Maker_db, Trains_db.maker_id == Maker_db.id
-            ).join(Type_db, Trains_db.type == Type_db.id)
+
+    #参照先のテーブルにIDが無い場合は、含まない
+    # db_trains_T = session.query(
+    #     Trains_db.id, Trains_db.product_no, Maker_db.id, Maker_db.maker_name,Trains_db.type,
+    #     Trains_db.type2, Trains_db.type3, Trains_db.name, Trains_db.name_d, Trains_db.length,
+    #     Trains_db.picture, Type_db.type, Type2_db.type2
+    #         ).join(Maker_db, Trains_db.maker_id == Maker_db.id
+    #         ).join(Type_db, Trains_db.type == Type_db.id
+    #         ).join(Type2_db, Trains_db.type2 == Type2_db.id
+    #                )
+
+    #参照先のテーブルにIDが無い場合は、含まない
+
+    if where == '':
+        db_trains_T = session.query(
+            Trains_db.id, Trains_db.product_no, Maker_db.id, Maker_db.maker_name,Trains_db.type,
+            Trains_db.type2, Trains_db.type3, Trains_db.name, Trains_db.name_d, Trains_db.length,
+            Trains_db.picture, Type_db.type, Type2_db.type2, Trains_db.x1, Trains_db.y1, Trains_db.x2, Trains_db.y2
+                ).join(Maker_db, Trains_db.maker_id == Maker_db.id
+                ).join(Type_db, Trains_db.type == Type_db.id , isouter = True    #Type_dbに無い場合は、Noneを返す。
+                ).join(Type2_db, Trains_db.type2 == Type2_db.id , isouter = True    #Type2_dbに無い場合は、Noneを返す。
+                    )
+    else:
+        db_trains_T = session.query(
+            Trains_db.id, Trains_db.product_no, Maker_db.id, Maker_db.maker_name,Trains_db.type,
+            Trains_db.type2, Trains_db.type3, Trains_db.name, Trains_db.name_d, Trains_db.length,
+            Trains_db.picture, Type_db.type, Type2_db.type2, Trains_db.x1, Trains_db.y1, Trains_db.x2, Trains_db.y2
+                ).join(Maker_db, Trains_db.maker_id == Maker_db.id
+                ).join(Type_db, Trains_db.type == Type_db.id , isouter = True    #Type_dbに無い場合は、Noneを返す。
+                ).join(Type2_db, Trains_db.type2 == Type2_db.id , isouter = True    #Type2_dbに無い場合は、Noneを返す。
+                ).filter(Trains_db.id == where)
 
     Items_T = []
     for i,row in enumerate(db_trains_T):
@@ -581,7 +686,12 @@ def select_trains_T(sort_order):
             'name_d': row[8],
             'length': row[9],
             'picture': row[10],
-            'type_db': 999,
+            'type_db': row[11],
+            'type2_db': row[12],
+            'x1': row[13],
+            'y1': row[14],
+            'x2': row[15],
+            'y2': row[16],
             'num': i})
     #print(Items_T)
 

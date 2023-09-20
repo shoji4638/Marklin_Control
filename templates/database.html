@@ -1,64 +1,163 @@
 {% extends "bootstrap/base.html" %}
 
-{% block head %}
-    {% block title %}{% endblock %}
+{% block html %}
+    {%- block head %}
+        {% block title %}{% endblock %}
 
-    {%- block metas %}
-    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="" />
-    <meta name="author" content="" />
-    {%- endblock metas %}
+        {%- block metas %}
+        <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        {%- endblock metas %}
 
-    {%- block styles %}
-    <!-- Bootstrap -->
-    <!-- <link href="{{bootstrap_find_resource('css/bootstrap.css', cdn='bootstrap')}}" rel="stylesheet"> -->
+        {%- block styles %}
+        <!-- Bootstrap -->
+        <!-- <link href="{{bootstrap_find_resource('css/bootstrap.css', cdn='bootstrap')}}" rel="stylesheet"> -->
 
-    <link rel="icon" type="image/x-icon"
-    href="{{ url_for('static', filename='assets/favicon.ico') }} "/>
-    <!-- Font Awesome icons (free version)-->
-    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-    <!-- Google fonts-->
-    <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css" />
-    <!-- Core theme CSS (includes Bootstrap)-->
-    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet" />
+        <link rel="icon" type="image/x-icon"
+        href="{{ url_for('static', filename='assets/favicon.ico') }} "/>
+        <!-- Font Awesome icons (free version)-->
+        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+        <!-- Google fonts-->
+        <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet" />
+        {%- endblock styles %}
+    {%- endblock head %}
 
-    {%- endblock styles %}
-{%- endblock head %}
 
-{% block navbar %}
+    {% block navbar %}
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-light bg-secondary" id="mainNav">
+        <div class="container px-0 px-lg-1">
+            <a class="navbar-brand">ItemData@ Shoji@ Märklin</a>
 
-        <!-- Navigation-->
-        <nav class="navbar navbar-expand-lg navbar-light" id="mainNav">
-            <div class="container bg-secondary px-4 px-lg-5">
-                <a class="navbar-brand">Database@ Shoji@ Märklin</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-                    Menu
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarResponsive">
-                    <ul class="navbar-nav ms-auto py-4 py-lg-0">
-                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ url_for('index')}}">Home</a></li>
-                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="about.html">About</a></li>
-                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ url_for('database')}}">DataBase</a></li>
-                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ url_for('productdata')}}">ProductData</a></li>
-                    </ul>
-                </div>
+            <!-- <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#Pr">Previous</a></li>
+                    <li class="page-item"><a class="page-link" href="#1">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#2">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#3">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#Ne">Next</a></li>
+                </ul>
+            </nav> -->
+        
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ms-auto py-4 py-lg-2">
+                    <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ url_for('index')}}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ url_for('database')}}">DataBase</a></li>
+                    <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ url_for('productdata')}}">ProductData</a></li>
+                </ul>
             </div>
-        </nav>
-{% endblock navbar %}
+        </div>
+    </nav>
+    <!-- <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <li class="page-item"><a class="page-link" href="#Pr">Previous</a></li>
+            <li class="page-item"><a class="page-link" href="#1">1</a></li>
+            <li class="page-item"><a class="page-link" href="#2">2</a></li>
+            <li class="page-item"><a class="page-link" href="#3">3</a></li>
+            <li class="page-item"><a class="page-link" href="#Ne">Next</a></li>
+        </ul>
+    </nav> -->
+    {% endblock navbar %}
 
 {% block content %}
 <!-- <header class="masthead"
 style="background-image: url{{ url_for('static', filename='assets/img/home-bg.jpg') }}"> -->
 
-<div class="container border bg-secondary">
-    <br>
-    <br>
-    <br>
-    <h2>TagとTrainIDの関連付け</h2>
+<div class="container-fluid border bg-secondary">
+    <div class="container text-white">
+        <div class="row">
+            <div class="col-12"></div>
+            <br>
+            <br>
+            <br>
+            <br>
+            <h2>TagとTrainIDの関連付け</h2>
+        </div>
+
+        <div class="row row-cols-2">
+            <div class="row text-white bg-secondary">
+                <div class="col-6">
+                    <div class="row">TagID
+                        <button type="button" class="btn btn-outline-info btn-xs">↑</button>
+                        <button type="button" class="btn btn-outline-danger btn-xs">↓</button>
+                    </div>
+                </div>
+                <!-- <div class="col-3">Name</div> -->
+                <div class="col-3">Picture</div>
+                <div class="col-1">Control</div>
+            </div>
+
+            <div class="row text-white bg-secondary">
+                <div class="col-3">
+                    <div class="row">TagID
+                        <button type="button" class="btn btn-outline-info  btn-sm">↑</button>
+                        <button type="button" class="btn btn-outline-danger  btn-sm">↓</button>
+                    </div>
+                </div>
+                <div class="col-3">Name</div>
+                <div class="col-4">Picture</div>
+                <div class="col-2">Control</div>
+            </div>
+
+        </div>
+
+        <div class="row row-cols-2">
+        {% for train in trains %}
+        <div class="container text-center">
+            <div class="row  border">
+                <div class="col-6">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="row">{{ train.tagid }}</div>
+                            <div class="row"><div class="center-block">⇐⇒</div></div>
+                            <div class="row">{{ train.trainid }}/{{ train.product_no }}</div>
+                            <div class="row"></div>
+                        </div>
+                        <div class="col-6">
+                            <div class="row">{{ train.name }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <img src="/static/img/{{ train.picture }}" class="img-fluid" alt="">
+                </div>
+                <div class="col-2">
+                    <a class="btn active btn-outline-info btn-sm" href="{{ url_for('database') }}/{{train.tagid}}/info" role="button">Info</a>
+                    <a class="btn active btn-outline-danger btn-sm" href="{{ url_for('database') }}/{{train.tagid}}/clear2" role="button">Del</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- <div class="row">
+            <div class="col-md-2">{{ train.tagid }}</div>
+            <div class="col-md-1">{{ train.trainid }}</div>
+            <div class="col-md-1">{{ train.product_no }}</div>
+            <div class="col-md-1">{{ train.type }}</div>
+            <div class="col-md-3">{{ train.name }}</div>
+            <div class="col-md-1">{{ train.length }}</div>
+            <div class="col-md-2"><img src="/static/img/{{ train.picture }}" class="img-fluid" alt=""></div>
+            <div class="col-md-1">
+                <button type="button" class="btn btn-outline-info  btn-sm">Info</button>
+                <button type="button" class="btn btn-outline-danger  btn-sm">delete</button>
+
+                <input type="submit" value="検索" formmethod="post" formaction="/trainserch">
+                <input type="submit" value="登録">
+        </div> -->
+        {% endfor %}
+        </div>
+
+    </div>
+</div>
     <form method="POST" action="{{ url_for('register') }}">
         <table border="1">
             <tr>
@@ -144,25 +243,6 @@ style="background-image: url{{ url_for('static', filename='assets/img/home-bg.jp
                     <br></th>
                 </form>
             </tr>
-            {% for train in trains %}
-                <tr>
-                    <td>{{ train.tagid }}</td>
-                    <td>{{ train.trainid }}</td>
-                    <td>{{ train.product_no }}</td>
-                    <td>{{ train.type }}</td>
-                    <td>{{ train.name }}</td>
-                    <td>{{ train.length }}</td>
-                    <td>{{ train.picture }}
-                        <img src = "C:\Users\s_shi\Documents\git\Marklin_Control\static\img\23.jpg" alt="[static/img/{{ train.picture }}] ???">
-                    </td>
-                    <td>
-                        <form method="POST" action="ClearOrChange">
-                        <button type = "Submit" name = "action" value = "Del:{{ train.tagid }}" formaction="/{{train.tagid}}/clear">削除</button>
-                        <button type = "Submit" name = "change" value = "Chg:{{ train.tagid }}" formaction="/{{train.tagid}}/change">変更</button>
-                        </form>
-                    </td>
-                </tr>
-            {% endfor %}
         </table>
         {% endif %}
 </div>
@@ -187,8 +267,8 @@ style="background-image: url{{ url_for('static', filename='assets/img/home-bg.jp
             </div>
         </header> -->
 
-
-{% endblock content %}
-
 <!-- Footer-->
 {% block footer %}TOP画面へ{% endblock %}
+
+{% endblock content %}
+{%- endblock html %}

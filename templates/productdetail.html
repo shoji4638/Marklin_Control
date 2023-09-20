@@ -32,7 +32,7 @@
     <!-- Navigation-->
     <nav class="navbar navbar-expand-lg navbar-light bg-secondary" id="mainNav">
         <div class="container px-0 px-lg-1">
-            <a class="navbar-brand">ProductData@ Shoji@ Märklin</a>
+            <a class="navbar-brand">Product Detail@ Shoji@ Märklin</a>
 
             <!-- <nav aria-label="Page navigation example">
                 <ul class="pagination">
@@ -77,36 +77,36 @@
             <br>
             <br>
             <br>
-            {{ pagination.info }}
-            {{ pagination.links }}
         <div class="row row-cols-4">
-        {% for Item_T in Items_T %}
-        <!-- <div class="row-cols-2">
-            <div class="col">[{{ Item_T.id }}]</div>
-            <div class="col">{{ Item_T.maker_name }}:{{ Item_T.product_no }}</div>
-            <div class="col">{{ Item_T.type }}</div>
-            <div class="col">{{ Item_T.name }}</div>
-        </div> -->
+            <div class="col.col-md-3">
+                <a>[{{ Items_T[0].id }}]</a>
+                <a>{{ Items_T[0].maker_name }}:{{ Items_T[0].product_no }}</a><br>
+                <a> @{% if Items_T[0].type_db != None %}{{ Items_T[0].type_db }}{% else %}{{ Items_T[0].type}}{% endif %}
+                    /{% if Items_T[0].type2_db != None %}{{ Items_T[0].type2_db }}{% else %}{{ Items_T[0].type2}}{% endif %}</a><br>
+                <a>{{ Items_T[0].name }}</a><br>
+                <a>{{ Items_T[0].name_d }}</a><br>
+                <a class="btn active btn-outline-info btn-sm" href="{{ url_for('productdata') }}/{{ Items_T[0].id}}/productinfo" role="button">Info</a>
+            </div>
 
             <div class="col.col-md-3">
-                <a>[{{ Item_T.id }}]</a>
-                <a>{{ Item_T.maker_name }}:{{ Item_T.product_no }}</a><br>
-                <a> @{% if Item_T.type_db != None %}{{ Item_T.type_db }}{% else %}{{ Item_T.type}}{% endif %}
-                    /{% if Item_T.type2_db != None %}{{ Item_T.type2_db }}{% else %}{{ Item_T.type2}}{% endif %}</a><br>
-                <a>{{ Item_T.name }}</a><br>
-                <a>{{ Item_T.name_d }}</a><br>
-                <a class="btn active btn-outline-info btn-sm" href="{{ url_for('productdata') }}/{{ Item_T.id}}/productinfo" role="button">Info</a>
+                <a>Original Size: {{ imgsize }} </a><br>
+                <a>{{ Items_T[0].x1 }}:{{ Items_T[0].y1 }} </a>
+                <a>{% if Items_T[0].x2 == 0 %}{{ imgsize[0] }}{% else %}{{ Items_T[0].x2 }}{% endif %}
+                :{% if Items_T[0].y2 == 0 %}{{ imgsize[1] }}{% else %}{{ Items_T[0].y2 }}{% endif %}</a><br>
+            </div>
 
-                <!-- <a>Type:{{ Item_T.type }}</a> -->
-            <!-- <a> db:{{ Item_T.type_db }}</a> -->
-                <!-- <a>Type2:{{ Item_T.type2 }}</a>
-                <a>Type3:{{ Item_T.type3 }}</a>
-                <a>pic:{{ Item_T.picture }}</a> -->
-            </div>
             <div class="col.col-md-3">
-                <img src="/static/img/{{ Item_T.picture }}" class="img-fluid" alt="">
+                <img src="/static/img/{{ Items_T[0].picture }}" class="img-thumbnail" alt="">
             </div>
-        {% endfor %}
+
+            <div class="col.col-md-3">
+                <!-- <a>Original Size: {{ imgsize }} {{ Items_T[0].x1 }}</a> -->
+                <img src="/static/img/{{ Items_T[0].picture }}" class="img-thumbnail" alt="">
+            </div>
+
+        </div>
+        <div class="row">
+            <img src="/static/img/{{ Items_T[0].picture }}" alt="">
         </div>
     </div>
     </div>

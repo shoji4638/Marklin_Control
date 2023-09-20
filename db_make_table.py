@@ -28,8 +28,13 @@ class Trains_db(Base):
     type3 = Column(Integer)
     seihin_no = Column(String(128))
     scale_id = Column(Integer)
+    model = Column(Integer)
     length = Column(Integer)
     picture = Column(String(64))
+    x1 = Column(Integer)
+    y1 = Column(Integer)
+    x2 = Column(Integer)
+    y2 = Column(Integer)
 
 class Item_db(Base):
     __tablename__ = 'itemdb'
@@ -45,9 +50,14 @@ class Maker_db(Base):
 class Type_db(Base):
     __tablename__ = 'type_T'
     id = Column(Integer, primary_key=True)
-    type1 = Column(String(45))
+    type = Column(String(45))
     type2 = Column(String(45))
     type3 = Column(String(45))
+
+class Type2_db(Base):
+    __tablename__ = 'type2_T'
+    id = Column(Integer, primary_key=True)
+    type2 = Column(String(45))
 
 def main(args):
     Base.metadata.create_all(bind=ENGINE)
